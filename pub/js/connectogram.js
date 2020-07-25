@@ -1,20 +1,15 @@
-const log = console.log;
+const log = console.log
 
 class Connectogram {
     constructor(after_html, name) {
-        this.root_div = this.addRootDiv(after_html, name);
         this.name = name;
+        this.className = "cgram-" + name
         this.blobs = [];
         this.edges = {};
+        this.root_html = addRoottoDOM(after_html, this.className)
     }
 
-    addRootDiv(after_html, name) {
-        root_div = "<svg class='cgram-" + name + "'></svg>"
-        addRoottoDOM(after_html, root_div)
-        return root_div
-    }
-
-    addBlob(name=null, shape=null, size, x=0, y=0, color="white", borderColor="black", ) {
+    addBlob(name=null, shape=null, size={}, x=0, y=0, color="white", borderColor="black") {
         if (name === null) {
             log("Could not instantiate Blob. Name missing.")
             return null
@@ -32,8 +27,25 @@ class Connectogram {
             log("Please select a valid shape. Ex: 'rectangle', 'circle', 'ellipse'")
             return null
         }
-        newBlob = new Blob(name, shape, color, borderColor, height, width, x, y);
-        newBlob.html = addBlobtoDOM(this.root_div, newBlob)
+        if (isEmpty(size)) {
+            log("Size missing.")
+            return null
+        }
+        let newBlob;
+        if (shape === "circle" && size['radius']) {
+            newBlob = new CircleBlob(name, shape, color, borderColor, x, y, size['radius'])
+        }
+        else if (shape === "rectangle" && size['height'] && size['width']) {
+            newBlob = new RectBlob(name, shape, color, borderColor, x, y, size['height'], size['width'])
+        }
+        else if (shape === "ellipse" && size['radiusx'] && size['radiusy']) {
+            newBlob = new EllipseBlob(name, shape, color, borderColor, x, y, size['radiusx'], size['radiusy'])
+        }
+        else {
+            log("Invalid parameters.")
+            return null
+        }
+        newBlob.html = addBlobtoDOM(this.root_html, newBlob)
         this.blobs.push(newBlob)
         return newBlob
     }
@@ -80,43 +92,69 @@ class CircleBlob extends Blob {
 class RectBlob extends Blob {
     constructor(name, shape, color, borderColor, x, y, height, width) {
         super(name, shape, color, borderColor, x, y);
-        this.radius = radius
+        this.height = height
+        this.width = width
     }
 }
 
 class EllipseBlob extends Blob {
-    constructor(name, shape, color, borderColor, x, y, height, width) {
+    constructor(name, shape, color, borderColor, x, y, radiusx, radiusy) {
         super(name, shape, color, borderColor, x, y);
-        this.radius = radius
+        this.radiusx = radiusx;
+        this.radiusy = radiusy;
     }
 }
 
 /**DOM Functions */
-function addRoottoDOM(after_html, root_div) {
-    $(after_html).after(root_div)
+function addRoottoDOM(after_html, className) {
+    const svg = d3.select(after_html).insert("svg").attr("viewBox", "0 0 100 100").attr("preserveAspectRatio", "xMinYMax meet").classed(className, true)
+    return svg
 }
 
-function addBlobtoDOM(root_div, blob) {
+function addBlobtoDOM(root_html, blob) {
+    const group = root_html.append("g")
     if (blob.shape === "rectangle") {
-        const blobDom = $("<rect />")
+        const blobDom = group.append("rect")
+        .attr("width", blob.width)
+        .attr("height", blob.height)
+        .attr("x", blob.x)
+        .attr("y", blob.y)
+        .attr("fill", blob.color)
+        .attr("stroke", blob.borderColor)
+        return blobDom
     }
-    if (blob.shape === "circle") {
-        const blobDom = $("<circle />")
-        $(blobDom).attr({
-            "cx"
-            "fill" : blob.color,
-            "stroke" : blobl.borderColor,
-            ""
-        })
+    else if (blob.shape === "circle") {
+        const blobDom = group.append("circle")
+        .attr("r", blob.radius)
+        .attr("cx", blob.x)
+        .attr("cy", blob.y)
+        .attr("fill", blob.color)
+        .attr("stroke", blob.borderColor)
+        return blobDom
     }
-    if (blob.shape === "ellipse") {
-        const blobDom = $("<ellipse />")
+    else if (blob.shape === "ellipse") {
+        const blobDom = group.append("ellipse")
+        .attr("rx", blob.radiusx)
+        .attr("ry", blob.radiusy)
+        .attr("cx", blob.x)
+        .attr("cy", blob.y)
+        .attr("fill", blob.color)
+        .attr("stroke", blob.borderColor)
+        return blobDom
     }
-
-
-
+    else {
+        log("SOMETHING WENT WRONG")
+        return null
+    }
 }
 
 function addTexttoBlob(blob) {
 
+}
+
+/** Misc. Functions */
+
+// Check if the object is empty
+const isEmpty = (obj) => {
+	return Object.keys(obj).length === 0;
 }

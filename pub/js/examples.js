@@ -1,4 +1,5 @@
-$(document).ready(function() {
-    console.log('eh')
-    $('body').append('hello');
-})
+const after_html = document.querySelector(".test-diagram-1")
+const cg = new Connectogram(after_html, "diagram1")
+const blobRect = cg.addBlob("blob1", "rectangle", {height: 50, width: 40}, 20, 10, "black", "blue")
+const blobCirc = cg.addBlob("blob2", "circle", {radius: 20}, 60, 70, "pink", "blue")
+const blobEllip = cg.addBlob("blob3", "ellipse", {radiusx: 40, radiusy: 20}, 100, 20, "red", "blue")
