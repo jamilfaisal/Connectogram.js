@@ -118,8 +118,19 @@ class Blob {
         this.text = "";
     }
 
-    addText(text) {
+    addText(text, font_family, font_size, text_align="left", color="black") {
+        if (this.text === "") {
+            this.text = text;
+        }
+        else {
+            this.text = this.text + "\n" + text
+        }
+        addTexttoBlob(this, text, font_family, font_size, text_align, color)
+    }
 
+    clearText() {
+        this.text = "";
+        removeTextFromBlob(this)
     }
 
     changeName(newName) {
@@ -227,6 +238,12 @@ function addBlobtoDOM(root_html, blob) {
         .attr("y", blob.y)
         .attr("fill", blob.color)
         .attr("stroke", blob.borderColor)
+        // For text elements
+        group.append("foreignObject")
+        .attr("x", blob.x)
+        .attr("y", blob.y)
+        .attr('width', blob.width)
+        .attr("height", blob.height)
         return blobDom
     }
     else if (blob.shape === "circle") {
@@ -236,6 +253,12 @@ function addBlobtoDOM(root_html, blob) {
         .attr("cy", blob.y)
         .attr("fill", blob.color)
         .attr("stroke", blob.borderColor)
+        // For text elements
+        group.append("foreignObject")
+        .attr("x", blob.x - blob.radius/1.5)
+        .attr("y", blob.y - blob.radius/1.5)
+        .attr('width', blob.radius*1.5)
+        .attr("height", blob.radius*1.5)
         return blobDom
     }
     else if (blob.shape === "ellipse") {
@@ -246,16 +269,35 @@ function addBlobtoDOM(root_html, blob) {
         .attr("cy", blob.y)
         .attr("fill", blob.color)
         .attr("stroke", blob.borderColor)
+        // For text elements
+        group.append("foreignObject")
+        .attr("x", blob.x)
+        .attr("y", blob.y)
+        .attr('width', blob.width)
+        .attr("height", blob.height)
         return blobDom
     }
+
     else {
         log("SOMETHING WENT WRONG")
         return null
     }
 }
 
-function addTexttoBlob(blob) {
+function addTexttoBlob(blob, text, font_family, font_size, text_align, color) {
+    const xmlns = "http://www.w3.org/1999/xhtml"
+    d3.select(blob.html.node().parentNode).select("foreignObject")
+    .append("xhtml:p").text(text)
+    .attr("xmlns", xmlns)
+    .style("font-family", font_family)
+    .style("font-size", font_size)
+    .style("text-align", text_align)
+    .style("fill", color)
+}
 
+function removeTextFromBlob(blob) {
+    d3.select(blob.html.node().parentNode).select("foreignObject")
+    .selectAll("p").remove()
 }
 
 function addEdgetoDOM(edge) {

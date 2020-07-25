@@ -2,3 +2,6 @@ svg {
     width: 500px;
     height: 300px;
 }
+p {
+    margin: 0;
+}
