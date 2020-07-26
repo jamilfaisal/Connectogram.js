@@ -496,6 +496,7 @@ function addBlobtoDOM(root_html, blob) {
         .attr("y", blob.y)
         .attr("fill", blob.color)
         .attr("stroke", blob.borderColor)
+        .attr("stroke-width", 3)
         // For text elements
         group.append("foreignObject")
         .attr("x", blob.x)
@@ -511,6 +512,7 @@ function addBlobtoDOM(root_html, blob) {
         .attr("cy", blob.y)
         .attr("fill", blob.color)
         .attr("stroke", blob.borderColor)
+        .attr("stroke-width", 3)
         // For text elements
         group.append("foreignObject")
         .attr("x", blob.x - blob.radius/1.4)
@@ -527,6 +529,7 @@ function addBlobtoDOM(root_html, blob) {
         .attr("cy", blob.y)
         .attr("fill", blob.color)
         .attr("stroke", blob.borderColor)
+        .attr("stroke-width", 3)
         // For text elements
         group.append("foreignObject")
         .attr("x", blob.x - blob.radiusx/1.4)
