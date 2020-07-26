@@ -5,7 +5,7 @@ const cg = new Connectogram(after_html, "diagram1")
 const blobRect = cg.addBlob("blobRect1", "rectangle", {height: 250, width: 175}, 0, 140, "green", "yellow")
 const blobRect2 = cg.addBlob("blobRect2", "rectangle", {height: 150, width: 140}, 850, 200, "black", "red")
 const blobCirc = cg.addBlob("blobCirc", "circle", {radius: 100}, 550, 125, "pink", "purple")
-const blobEllip = cg.addBlob("blobEllip", "ellipse", {radiusx: 150, radiusy: 80}, 450, 400, "red", "blue")
+const blobEllip = cg.addBlob("blobEllip", "ellipse", {radiusx: 150, radiusy: 80}, 450, 400, "INDIANRED", "blue")
 // Edges
 cg.connect(blobRect, blobRect2, "blue", 5)
 cg.connect(blobCirc, blobEllip, "red", 10)
