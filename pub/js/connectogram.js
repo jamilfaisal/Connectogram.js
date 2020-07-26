@@ -155,6 +155,7 @@ class Blob {
         this.numCols = 0;
         this.html = null;
         this.text = "";
+        this.link = "";
     }
 
     addText(text, font_family, font_size, text_align="left", color="black") {
@@ -174,6 +175,26 @@ class Blob {
     clearText() {
         this.text = "";
         removeTextFromBlob(this)
+    }
+
+    setLink(link) {
+        if (this.link === "") {
+            this.link = link;
+            setLinktoBlob(this.html, link);
+        }
+        else {
+            this.link = link
+            changeLinktoBlob(this.html, link)
+        }
+    }
+
+    clearLink() {
+        if (this.link === "") {
+            log("No link to remove.")
+            return null
+        }
+        this.link = ""
+        clearLinktoBlob(this.html)
     }
 
     changeName(newName) {
@@ -398,7 +419,7 @@ function addRoottoDOM(after_html, className) {
 function addBlobtoDOM(root_html, blob) {
     const group = root_html.append("g")
     if (blob.shape === "rectangle") {
-        const blobDom = group.append("rect")
+        const blobDOM = group.append("rect")
         .attr("width", blob.width)
         .attr("height", blob.height)
         .attr("x", blob.x)
@@ -411,10 +432,10 @@ function addBlobtoDOM(root_html, blob) {
         .attr("y", blob.y)
         .attr('width', blob.width)
         .attr("height", blob.height)
-        return blobDom
+        return blobDOM
     }
     else if (blob.shape === "circle") {
-        const blobDom = group.append("circle")
+        const blobDOM = group.append("circle")
         .attr("r", blob.radius)
         .attr("cx", blob.x)
         .attr("cy", blob.y)
@@ -426,10 +447,10 @@ function addBlobtoDOM(root_html, blob) {
         .attr("y", blob.y - blob.radius/1.4)
         .attr('width', blob.radius*1.4)
         .attr("height", blob.radius*1.4)
-        return blobDom
+        return blobDOM
     }
     else if (blob.shape === "ellipse") {
-        const blobDom = group.append("ellipse")
+        const blobDOM = group.append("ellipse")
         .attr("rx", blob.radiusx)
         .attr("ry", blob.radiusy)
         .attr("cx", blob.x)
@@ -442,7 +463,7 @@ function addBlobtoDOM(root_html, blob) {
         .attr("y", blob.y - blob.radiusy/1.4)
         .attr('width', blob.radiusx*1.4)
         .attr("height", blob.radiusy*1.4)
-        return blobDom
+        return blobDOM
     }
 
     else {
@@ -470,14 +491,35 @@ function updateTextPosition(blobDOM, x, y, width, height) {
     .attr("height", height)
 }
 
-function alignTextBlob(blobDom, newTextAlign) {
-    d3.select(blobDom.node().parentNode).select("foreignObject")
+function alignTextBlob(blobDOM, newTextAlign) {
+    d3.select(blobDOM.node().parentNode).select("foreignObject")
     .selectAll("p").style("text-align", newTextAlign)
 }
 
 function removeTextFromBlob(blob) {
     d3.select(blob.html.node().parentNode).select("foreignObject")
     .selectAll("p").remove()
+}
+
+function setLinktoBlob(blobDOM, link) {
+    const group = blobDOM.node().parentNode
+    const root_node = group.parentNode
+    d3.select(root_node).append("a")
+    .attr("xlink:href", link)
+    .append(function() { return group})
+}
+
+function changeLinktoBlob(blobDOM, link) {
+    const a = blobDOM.node().parentNode.parentNode
+    d3.select(a).attr("xlink:href", link)
+}
+
+function clearLinktoBlob(blobDOM) {
+    const group = blobDOM.node().parentNode
+    const a = group.parentNode
+    const root_node = a.parentNode
+    d3.select(root_node).append(function() {return group})
+    a.remove()
 }
 
 function addEdgetoDOM(root_html, edge) {
@@ -498,28 +540,28 @@ function updateEdgePositions(edge) {
     .attr("y2", edge.y2)
 }
 
-function changeBlobWidth(blobDom, newWidth) {
-    blobDom.attr("width", newWidth);
+function changeBlobWidth(blobDOM, newWidth) {
+    blobDOM.attr("width", newWidth);
 }
 
-function changeBlobHeight(blobDom, newHeight) {
-    blobDom.attr("height", newHeight);
+function changeBlobHeight(blobDOM, newHeight) {
+    blobDOM.attr("height", newHeight);
 }
 
-function changeBlobRadius(blobDom, newRadius) {
-    blobDom.attr("r", newRadius)
+function changeBlobRadius(blobDOM, newRadius) {
+    blobDOM.attr("r", newRadius)
 }
 
-function changeBlobRadiusxy(blobDom, newRadiusx, newRadiusy) {
-    blobDom.attr("rx", newRadiusx).attr("ry", newRadiusy);
+function changeBlobRadiusxy(blobDOM, newRadiusx, newRadiusy) {
+    blobDOM.attr("rx", newRadiusx).attr("ry", newRadiusy);
 }
 
-function changeBlobColor(blobDom, newColor) {
-    blobDom.attr("fill", newColor)
+function changeBlobColor(blobDOM, newColor) {
+    blobDOM.attr("fill", newColor)
 }
 
-function changeBlobBorderColor(blobDom, newColor) {
-    blobDom.attr("stroke", newColor)
+function changeBlobBorderColor(blobDOM, newColor) {
+    blobDOM.attr("stroke", newColor)
 }
 
 function setBlobPosition(blob, newX, newY) {
