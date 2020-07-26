@@ -10,6 +10,7 @@ const blobEllip = cg.addBlob("blobEllip", "ellipse", {radiusx: 150, radiusy: 80}
 cg.connect(blobRect, blobRect2, "blue", 5)
 cg.connect(blobCirc, blobEllip, "red", 10)
 cg.connect(blobCirc, blobRect, "green", 1)
+cg.connect(blobCirc, blobRect2, "brown", 3)
 // Text
 blobRect.addText("Large Text", "Verdana", "40px", "left", "black")
 blobRect.addText("Normal Text", "Verdana", "20px", "left", "black")
