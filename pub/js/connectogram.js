@@ -56,6 +56,15 @@ class Connectogram {
             log("Blob not found.")
             return null;
         }
+        // Edge Removal
+        const edges = this.getEdgesForBlob(blobToRemove)
+        for (let i=0; i < edges.length; i++) {
+            this.edges = this.edges.filter(function(edge) {
+                return edges[i] !== edge;
+            })
+            removeEdgeFromDOM(edges[i])
+        }
+        // Blob Removal
         this.blobs = this.blobs.filter(function(blob) {
             return blob !== blobToRemove
         })
@@ -106,6 +115,13 @@ class Connectogram {
         }
     }
 
+    getEdgesForBlob(blob) {
+        const edges = this.edges.filter(function(edge) {
+            return (edge.from === blob || edge.to === blob)
+        })
+        return edges
+    }
+
     changeBlobName(oldName, newName) {
         if (oldName === newName) {
             log("Same name.")
@@ -151,6 +167,10 @@ class Blob {
         addTexttoBlob(this, text, font_family, font_size, text_align, color)
     }
 
+    textAlign(newTextAlign) {
+        alignTextBlob(this.html, newTextAlign)
+    }
+
     clearText() {
         this.text = "";
         removeTextFromBlob(this)
@@ -170,14 +190,46 @@ class Blob {
         changeBlobBorderColor(this.html, newColor);
     }
 
+    changeShape(newShape) {
+        if (newShape === this.shape) {
+            log("Same shape...")
+            return null
+        }
+        if (newShape === "circle") {
+
+        }
+    }
+
     setPosition(newX=this.x, newY=this.y) {
         this.x = newX;
         this.y = newY;
+        this.updateEdges()
         setBlobPosition(this, newX, newY);
+        if (this.shape === "rectangle") {
+            updateTextPosition(this.html, this.x, this.y, this.width, this.height);
+        }
+        else if (this.shape === "circle") {
+            updateTextPosition(this.html, this.x - this.radius/1.4, this.y - this.radius/1.4, this.radius*1.4, this.radius*1.4);
+        }
+        else {
+            updateTextPosition(this.html, this.x - this.radiusx/1.4, this.y - this.radiusy/1.4, this.radiusx*1.4, this.radiusy*1.4);
+        }
+    }
+
+    updateEdges() {
+        const edges = this.cgram.getEdgesForBlob(this)
+        for (let i=0; i < edges.length; i++) {
+            edges[i].calculatePositions()
+            updateEdgePositions(edges[i])
+        }
     }
 
     toggleHide() {
         toggleBlobHide(this.html);
+        const edges = this.cgram.getEdgesForBlob(this)
+        for (let i=0; i < edges.length; i++) {
+            toggleEdgeHide(edges[i].html)
+        }
     }
 }
 
@@ -206,6 +258,8 @@ class CircleBlob extends Blob {
     changeRadius(newRadius=this.radius) {
         this.radius = newRadius;
         changeBlobRadius(this.html, newRadius);
+        this.updateEdges()
+        updateTextPosition(this.html, this.x - this.radius/1.4, this.y - this.radius/1.4, this.radius*1.4, this.radius*1.4);
     }
 }
 
@@ -235,11 +289,15 @@ class RectBlob extends Blob {
     changeWidth(newWidth=this.width) {
         this.width = newWidth;
         changeBlobWidth(this.html, newWidth)
+        this.updateEdges()
+        updateTextPosition(this.html, this.x, this.y, this.width, this.height);
     }
 
     changeHeight(newHeight=this.height) {
         this.height = newHeight;
         changeBlobHeight(this.html, newHeight)
+        this.updateEdges()
+        updateTextPosition(this.html, this.x, this.y, this.width, this.height);
     }
 }
 
@@ -269,6 +327,8 @@ class EllipseBlob extends Blob {
         this.radiusx = newRadiusx;
         this.radiusy = newRadiusy;
         changeBlobRadiusxy(this.html, newRadiusx, newRadiusy)
+        this.updateEdges()
+        updateTextPosition(this.html, this.x - this.radiusx/1.4, this.y - this.radiusy/1.4, this.radiusx*1.4, this.radiusy*1.4);
     }
 }
 
@@ -362,10 +422,10 @@ function addBlobtoDOM(root_html, blob) {
         .attr("stroke", blob.borderColor)
         // For text elements
         group.append("foreignObject")
-        .attr("x", blob.x - blob.radius/1.5)
-        .attr("y", blob.y - blob.radius/1.5)
-        .attr('width', blob.radius*1.5)
-        .attr("height", blob.radius*1.5)
+        .attr("x", blob.x - blob.radius/1.4)
+        .attr("y", blob.y - blob.radius/1.4)
+        .attr('width', blob.radius*1.4)
+        .attr("height", blob.radius*1.4)
         return blobDom
     }
     else if (blob.shape === "ellipse") {
@@ -378,10 +438,10 @@ function addBlobtoDOM(root_html, blob) {
         .attr("stroke", blob.borderColor)
         // For text elements
         group.append("foreignObject")
-        .attr("x", blob.x)
-        .attr("y", blob.y)
-        .attr('width', blob.width)
-        .attr("height", blob.height)
+        .attr("x", blob.x - blob.radiusx/1.4)
+        .attr("y", blob.y - blob.radiusy/1.4)
+        .attr('width', blob.radiusx*1.4)
+        .attr("height", blob.radiusy*1.4)
         return blobDom
     }
 
@@ -399,7 +459,20 @@ function addTexttoBlob(blob, text, font_family, font_size, text_align, color) {
     .style("font-family", font_family)
     .style("font-size", font_size)
     .style("text-align", text_align)
-    .style("fill", color)
+    .style("color", color)
+}
+
+function updateTextPosition(blobDOM, x, y, width, height) {
+    d3.select(blobDOM.node().parentNode).select("foreignObject")
+    .attr("x", x)
+    .attr("y", y)
+    .attr('width', width)
+    .attr("height", height)
+}
+
+function alignTextBlob(blobDom, newTextAlign) {
+    d3.select(blobDom.node().parentNode).select("foreignObject")
+    .selectAll("p").style("text-align", newTextAlign)
 }
 
 function removeTextFromBlob(blob) {
@@ -415,6 +488,14 @@ function addEdgetoDOM(root_html, edge) {
     .attr("y2", edge.y2)
     .style("stroke", edge.color)
     .attr("stroke-width", edge.stroke_width)
+}
+
+function updateEdgePositions(edge) {
+    edge.html
+    .attr("x1", edge.x1)
+    .attr("y1", edge.y1)
+    .attr("x2", edge.x2)
+    .attr("y2", edge.y2)
 }
 
 function changeBlobWidth(blobDom, newWidth) {
@@ -453,12 +534,26 @@ function setBlobPosition(blob, newX, newY) {
 function toggleBlobHide(blobDOM) {
     if (blobDOM.attr('visibility') === "hidden") {
         blobDOM.attr("visibility", "visibile")
+        d3.select(blobDOM.node().parentNode).select("foreignObject")
+        .selectAll("p")
+        .style("visibility", "visible")
     }
     else {
         blobDOM.attr("visibility", "hidden")
+        d3.select(blobDOM.node().parentNode).select("foreignObject")
+        .selectAll("p")
+        .style("visibility", "hidden")
     }
 }
 
+function toggleEdgeHide(edgeDOM) {
+    if (edgeDOM.attr("visibility") === "hidden") {
+        edgeDOM.attr("visibility", "visible")
+    }
+    else {
+        edgeDOM.attr("visibility", "hidden")
+    }
+}
 function removeBlobFromDOM(blob) {
     blob.html.remove();
 }
