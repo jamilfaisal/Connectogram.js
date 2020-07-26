@@ -42,8 +42,8 @@ linkRect2.setLink("http://corndog.io/")
 // Color Change
 const colorEllip = cg2.addBlob("colorEllip", "ellipse", {radiusx: 100, radiusy: 30}, 765, 100, "black", "black")
 // Alert
-const alertCircle = cg2.addBlob("alertCirc", "circle", {radius: 70}, 955, 100, "turquoise", "red")
-alertCircle.addText("Click the blue!", "Arial", "20px", "center", "red")
+const alertCircle = cg2.addBlob("alertCirc", "circle", {radius: 55}, 955, 100, "turquoise", "red")
+alertCircle.addText("Click me!", "Arial", "27px", "center", "red")
 alertCircle.addEvent("click", function() {
     alert("This is a callback function. You can add events to all the shapes!")
     log("This is a secret message...")
