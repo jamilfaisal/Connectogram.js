@@ -140,6 +140,62 @@ class Connectogram {
         log("Name Changed.")
         return blob
     }
+
+    displayAll() {
+        for (let i=0; i < this.blobs.length; i++) {
+            this.displayBlob(this.blobs[i])
+            log("\n")
+        }
+    }
+
+    displayBlob(blob) {
+        if (this.getBlob(blob.name)) {
+            log("Diagram Name: " + this.name)
+            log("Blob Name: " + blob.name);
+            log("Shape: " + blob.shape)
+            log("(x, y) Coordinates: (" + blob.x + ", " + blob.y + ")")
+            if (blob.shape === "rectangle") {
+                log("Width: " + blob.width + "px")
+                log("Height: " + blob.height + "px")
+            }
+            else if (blob.shape === "circle") {
+                log("Radius: " + blob.radius + "px")
+            }
+            else {
+                log("Radius X: " + blob.radiusx + "px")
+                log("Radius Y: " + blob.radiusy + "px")
+            }
+            log("Color: " + blob.color)
+            log("Border Color: " + blob.borderColor)
+            if (blob.text !== "") {
+                log("Internal Text: " + blob.text)
+            }
+            if (blob.link !== "") {
+                log("Links to: " + blob.link)
+            }
+            if (!isEmpty(blob.func)) {
+                log("Events: ")
+                const keys = Object.keys(blob.func)
+                for (let i=0; i < keys.length; i++) {
+                    log("Listener: " + keys[i] + ", Event: " + blob.func[keys[i]])
+                }
+            }
+            this.displayEdges(blob)
+        } else {
+            log("Blob not found.")
+        }
+    }
+
+    displayEdges(blob) {
+        const edges = this.getEdgesForBlob(blob)
+        if (edges.length === 0) {
+            return null
+        }
+        log("Edges: ")
+        for (let i=0; i < edges.length; i++) {
+            log("\t " + edges[i].from.name + " -> " + edges[i].to.name)
+        }
+    }
 }
 
 class Blob {
@@ -151,11 +207,12 @@ class Blob {
         this.y = y;
         this.color = color;
         this.borderColor = borderColor;
-        this.numRows = 0;
-        this.numCols = 0;
+        this.numRows = 0;   // Implement later
+        this.numCols = 0;   // Implement later
         this.html = null;
         this.text = "";
         this.link = "";
+        this.func = {};
     }
 
     addText(text, font_family, font_size, text_align="left", color="black") {
@@ -211,15 +268,17 @@ class Blob {
         changeBlobBorderColor(this.html, newColor);
     }
 
-    changeShape(newShape) {
-        if (newShape === this.shape) {
-            log("Same shape...")
-            return null
-        }
-        if (newShape === "circle") {
-
-        }
-    }
+    // Needs Work
+    // changeShape(newShape) {
+    //     if (newShape === this.shape) {
+    //         log("Same shape...")
+    //         return null
+    //     }
+    //     if (newShape !== "rectangle" || newShape !== "circle" || newShape !== "ellipse") {
+    //         log("Invalid Shape.")
+    //         return null
+    //     }
+    // }
 
     setPosition(newX=this.x, newY=this.y) {
         this.x = newX;
@@ -251,6 +310,16 @@ class Blob {
         for (let i=0; i < edges.length; i++) {
             toggleEdgeHide(edges[i].html)
         }
+    }
+
+    addEvent(eventListener, func) {
+        this.func[eventListener] = func;
+        addEventToBlob(this.html, eventListener, func);
+    }
+
+    removeEvent(eventListener) {
+        delete this.func[eventListener];
+        removeEventFromBlob(this.html, eventListener)
     }
 }
 
@@ -412,7 +481,8 @@ class Edge {
 
 /**DOM Functions */
 function addRoottoDOM(after_html, className) {
-    const svg = d3.select(after_html).insert("svg").classed(className, true)
+    const svg = d3.select(after_html).insert("svg")
+    .classed(className, true)
     return svg
 }
 
@@ -465,10 +535,38 @@ function addBlobtoDOM(root_html, blob) {
         .attr("height", blob.radiusy*1.4)
         return blobDOM
     }
-
     else {
         log("SOMETHING WENT WRONG")
         return null
+    }
+}
+
+function updateBlob(blob) {
+    if (blob.shape === "rectangle") {
+        blob.html
+        .attr("width", blob.width)
+        .attr("height", blob.height)
+        .attr("x", blob.x)
+        .attr("y", blob.y)
+        .attr("fill", blob.color)
+        .attr("stroke", blob.borderColor)
+    }
+    else if (blob.shape === "circle") {
+        blob.html
+        .attr("r", blob.radius)
+        .attr("cx", blob.x)
+        .attr("cy", blob.y)
+        .attr("fill", blob.color)
+        .attr("stroke", blob.borderColor)
+    }
+    else {
+        blob.html
+        .attr("rx", blob.radiusx)
+        .attr("ry", blob.radiusy)
+        .attr("cx", blob.x)
+        .attr("cy", blob.y)
+        .attr("fill", blob.color)
+        .attr("stroke", blob.borderColor)
     }
 }
 
@@ -495,6 +593,12 @@ function alignTextBlob(blobDOM, newTextAlign) {
     d3.select(blobDOM.node().parentNode).select("foreignObject")
     .selectAll("p").style("text-align", newTextAlign)
 }
+
+// function verticalAlignBlob(blobDOM) {
+//     const div_height = d3.select(blobDOM.node().parentNode).select("foreignObject").attr("height")
+//     d3.select(blobDOM.node().parentNode).select("foreignObject")
+//     .selectAll("p").style("line-height", div_height)
+// }
 
 function removeTextFromBlob(blob) {
     d3.select(blob.html.node().parentNode).select("foreignObject")
@@ -597,17 +701,49 @@ function toggleEdgeHide(edgeDOM) {
     }
 }
 function removeBlobFromDOM(blob) {
-    blob.html.remove();
+    blob.html.node().parentNode.remove()
 }
 
 function removeEdgeFromDOM(edge) {
     edge.html.remove();
 }
 
+function addEventToBlob(blobDOM, eventListener, func) {
+    blobDOM.on(eventListener, func);
+}
+
+function removeEventFromBlob(blobDOM, eventListener) {
+    blobDOM.on(eventListener, null)
+}
+
+/**Blob Dragging Functions Below */
 
 /** Misc. Functions */
 
 // Check if the object is empty
 const isEmpty = (obj) => {
-	return Object.keys(obj).length === 0;
+    return Object.keys(obj).length === 0;
 }
+
+// Get Radius
+function extractRadiusFromRect(width, height) {
+    return Math.pow(Math.pow(width, 2) + Math.pow(height, 2), 0.5)
+}
+
+function extractRadiusFromEllip(radiusx, radiusy) {
+    if (radiusx > radiusy) {
+        return radiusx
+    } else {
+        return radiusy
+    }
+}
+
+// Export SVG Image
+// function exportSVG(cgram) {
+//     const svg = cgram.root_html;
+
+//     const serializer = new XMLSerializer();
+//     const source = serializer.serializeToString(svg)
+
+
+// }
