@@ -47,14 +47,6 @@ button {
     margin-left: 200px;
 }
 
-.size_button {
-
-}
-
-.position_button {
-
-}
-
 @keyframes fadeIn {
     0% {
       opacity: 0;
