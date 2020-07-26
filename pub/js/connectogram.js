@@ -712,11 +712,13 @@ function removeEdgeFromDOM(edge) {
 }
 
 function addEventToBlob(blobDOM, eventListener, func) {
-    blobDOM.on(eventListener, func);
+    const foreignObject = d3.select(blobDOM.node().parentNode).select("foreignObject")
+    foreignObject.on(eventListener, func);
 }
 
 function removeEventFromBlob(blobDOM, eventListener) {
-    blobDOM.on(eventListener, null)
+    const foreignObject = d3.select(blobDOM.node().parentNode).select("foreignObject")
+    foreignObject.on(eventListener, null)
 }
 
 /**Blob Dragging Functions Below */
