@@ -5,7 +5,7 @@ class Connectogram {
         this.name = name;
         this.className = "cgram-" + name
         this.blobs = [];
-        this.edges = {};
+        this.edges = [];
         this.root_html = addRoottoDOM(after_html, this.className)
     }
 
@@ -51,15 +51,15 @@ class Connectogram {
     }
 
     removeBlob(name) {
-        const blob = this.getBlob(name);
-        if (blob === null) {
+        const blobToRemove = this.getBlob(name);
+        if (blobToRemove === null) {
             log("Blob not found.")
             return null;
         }
         this.blobs = this.blobs.filter(function(blob) {
-            return blob !== blob
+            return blob !== blobToRemove
         })
-        removeBlobFromDOM(blob);
+        removeBlobFromDOM(blobToRemove);
     }
 
     getBlob(name) {
@@ -74,13 +74,36 @@ class Connectogram {
         }
     }
 
-    connect(blob1, blob2) {
-        if (this.edges[blob1] === blob2) {
-            log("The blobs are already connected1")
+    connect(blob1, blob2, color="black", stroke_width=2) {
+        if (this.getEdge(blob1, blob2) !== null) {
+            log("The blobs are already connected")
             return null
         }
-        this.edges[blob1] = blob2;
+        this.edges.push(new Edge(this.root_html, "default", blob1, blob2, color, stroke_width))
+    }
 
+    disconnect(blob1, blob2) {
+        const edgeToRemove = this.getEdge(blob1, blob2)
+        if (edgeToRemove === null) {
+            log("Edge not found.")
+            return null;
+        }
+        this.edges = this.edges.filter(function(edge) {
+            return edgeToRemove !== edge;
+        })
+        removeEdgeFromDOM(edgeToRemove);
+    }
+
+    getEdge(blob1, blob2) {
+        const edge = this.edges.filter(function(edge) {
+            return (edge.from === blob1 && edge.to === blob2) || (edge.from === blob2 && edge.to === blob1)
+        })
+        if (edge.length === 0) {
+            return null
+        }
+        else {
+            return edge[0]
+        }
     }
 
     changeBlobName(oldName, newName) {
@@ -164,6 +187,22 @@ class CircleBlob extends Blob {
         this.radius = radius
     }
 
+    getCenterX() {
+        return this.x;
+    }
+
+    getCenterY() {
+        return this.y
+    }
+
+    getWidth() {
+        return 2*this.radius
+    }
+
+    getHeight() {
+        return 2*this.radius
+    }
+
     changeRadius(newRadius=this.radius) {
         this.radius = newRadius;
         changeBlobRadius(this.html, newRadius);
@@ -175,6 +214,22 @@ class RectBlob extends Blob {
         super(cgram, name, shape, color, borderColor, x, y);
         this.height = height
         this.width = width
+    }
+
+    getCenterX() {
+        return this.x + this.width/2
+    }
+
+    getCenterY() {
+        return this.y + this.height/2
+    }
+    
+    getWidth() {
+        return this.width;
+    }
+
+    getHeight() {
+        return this.height;
     }
 
     changeWidth(newWidth=this.width) {
@@ -195,6 +250,21 @@ class EllipseBlob extends Blob {
         this.radiusy = radiusy;
     }
 
+    getCenterX() {
+        return this.x;
+    }
+    
+    getCenterY() {
+        return this.y;
+    }
+    
+    getWidth() {
+        return 2*this.radiusx
+    }
+    getHeight() {
+        return 2*this.radiusy
+    }
+
     changeRadius(newRadiusx=this.radiusx, newRadiusy=this.radiusy) {
         this.radiusx = newRadiusx;
         this.radiusy = newRadiusy;
@@ -203,28 +273,65 @@ class EllipseBlob extends Blob {
 }
 
 class Edge {
-    constructor(type, from, to, color=null) {
+    constructor(root_html, type, from, to, color, stroke_width) {
         this.type = type;
         this.from = from;
         this.to = to;
         this.color = color;
+        this.stroke_width = stroke_width;
         this.x1 = 0;
         this.y1 = 0;
         this.x2 = 0;
         this.y2 = 0;
-        calculatePositions()
+        this.calculatePositions()
+        this.html = addEdgetoDOM(root_html, this)
     }
 
     calculatePositions() {
+        // const deltax = this.from.getCenterX() - this.to.getCenterX()
+        // const deltay = this.from.getCenterY() - this.to.getCenterY()
+        // const p1 = this.findBorderPoints(deltax, deltay, this.from.getCenterX(), this.from.getCenterY(), this.from.getWidth()/2, this.from.getHeight()/2)
+        // const p2 = this.findBorderPoints(-deltax, -deltay, this.to.getCenterX(), this.to.getCenterY(), this.to.getWidth()/2, this.to.getHeight()/2)
+        // this.x1 = p1[0]
+        // this.y1 = p1[1]
+        // this.x2 = p2[0]
+        // this.y2 = p2[1]
+
+        this.x1 = this.from.getCenterX()
+        this.y1 = this.from.getCenterY()
+        this.x2 = this.to.getCenterX()
+        this.y2 = this.to.getCenterY()
 
     }
 
+    findBorderPoints(deltax, deltay, centerx, centery, width, height) {
+        const distance_ratio = Math.abs(deltay/deltax);
+        const size_ratio = height/width
+        let xpoint;
+        let ypoint;
+        if (distance_ratio < size_ratio) {
+            if (deltax > 0) {
+                xpoint = centerx + width
+            } else {
+                xpoint = centerx - width
+            }
+            ypoint = centery + deltay * width/Math.abs(deltax)
+        } else {
+            if (deltay > 0) {
+                ypoint = centery + height
+            } else {
+                ypoint = centery - height
+            }
+            xpoint = centerx + deltax * height/Math.abs(deltay)
+        }
+        return [xpoint, ypoint]
+    }
 
 }
 
 /**DOM Functions */
 function addRoottoDOM(after_html, className) {
-    const svg = d3.select(after_html).insert("svg").attr("viewBox", "0 0 100 100").attr("preserveAspectRatio", "xMinYMax meet").classed(className, true)
+    const svg = d3.select(after_html).insert("svg").classed(className, true)
     return svg
 }
 
@@ -300,8 +407,14 @@ function removeTextFromBlob(blob) {
     .selectAll("p").remove()
 }
 
-function addEdgetoDOM(edge) {
-
+function addEdgetoDOM(root_html, edge) {
+    return root_html.insert("line", ":first-child")
+    .attr("x1", edge.x1)
+    .attr("y1", edge.y1)
+    .attr("x2", edge.x2)
+    .attr("y2", edge.y2)
+    .style("stroke", edge.color)
+    .attr("stroke-width", edge.stroke_width)
 }
 
 function changeBlobWidth(blobDom, newWidth) {
@@ -347,8 +460,11 @@ function toggleBlobHide(blobDOM) {
 }
 
 function removeBlobFromDOM(blob) {
-    blobDOM = blob.html
-    blobDOM.remove();
+    blob.html.remove();
+}
+
+function removeEdgeFromDOM(edge) {
+    edge.html.remove();
 }
 
 
