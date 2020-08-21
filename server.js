@@ -8,7 +8,15 @@ const app = express();
 app.use(express.static(__dirname + '/pub'))
 
 app.get("/", (req, res) => {
+	res.sendFile(__dirname + "/pub/welcome.html")
+})
+
+app.get("/examples", (req, res) => {
 	res.sendFile(__dirname + "/pub/examples.html")
+})
+
+app.get("/testing", (req, res) => {
+	res.sendFile(__dirname + "/pub/testing.html")
 })
 
 const port = process.env.PORT || 5000
