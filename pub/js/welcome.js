@@ -7,8 +7,8 @@ function generateRect(cg) {
     const name = "blobRect" + cg.blobs.length;
     const height = getRandomInteger(25, 200)
     const width = getRandomInteger(25, 200)
-    const x = getRandomInteger(25, 1366);
-    const y = getRandomInteger(25, 600);
+    const x = getRandomInteger(25, 1300);
+    const y = getRandomInteger(25, 550);
     const color = '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
     const bordercolor = '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
     cg.addBlob(name, "rectangle", {height: height, width: width}, x, y, color, bordercolor).toggleDraggable()
@@ -17,8 +17,8 @@ function generateRect(cg) {
 function generateCircle(cg) {
     const name = "blobCirc" + cg.blobs.length;
     const radius = getRandomInteger(10, 100)
-    const x = getRandomInteger(25, 1366);
-    const y = getRandomInteger(25, 600);
+    const x = getRandomInteger(25, 1300);
+    const y = getRandomInteger(25, 580);
     const color = '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
     const bordercolor = '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
     cg.addBlob(name, "circle", {radius: radius}, x, y, color, bordercolor).toggleDraggable()
@@ -28,8 +28,8 @@ function generateEllip(cg) {
     const name = "blobEllip" + cg.blobs.length;
     const radiusx = getRandomInteger(10, 125)
     const radiusy = getRandomInteger(10, 125)
-    const x = getRandomInteger(25, 1366);
-    const y = getRandomInteger(25, 600);
+    const x = getRandomInteger(25, 1300);
+    const y = getRandomInteger(25, 580);
     const color = '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
     const bordercolor = '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
     cg.addBlob(name, "ellipse", {radiusx: radiusx, radiusy: radiusy}, x, y, color, bordercolor).toggleDraggable()
@@ -38,7 +38,7 @@ function generateEllip(cg) {
 function connectRand(cg) {
     const blob1 = cg.blobs[getRandomInteger(0, cg.blobs.length)]
     const blob2 = cg.blobs[getRandomInteger(0, cg.blobs.length)]
-    const types = ["default", "dotted", "dashed"]
+    const types = ["default", "dotted"]
     const typeChoice = types[getRandomInteger(0, 4)]
     const color = '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
     const strokeWidth = getRandomInteger(1, 6)
@@ -47,7 +47,7 @@ function connectRand(cg) {
 
 function generateRandBlob(cg) {
 
-    if (cg.blobs.length % 3 === 0) {
+    if (cg.blobs.length % 2 === 0) {
         connectRand(cg)
     }
 
@@ -68,4 +68,4 @@ const cg = new Connectogram(after_html, "main_diagram")
 
 const interval = setInterval(function() {
     generateRandBlob(cg);
-  }, 3000);
+  }, 3500);

@@ -1,19 +1,35 @@
+
+html {
+    width: 100vw;
+    height: 100vh;
+    padding: 25px;
+    margin: 0px;
+    overflow-x: hidden;
+}
+
 body {
     background-color: lightgoldenrodyellow;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+a, a:focus, a:hover {
+    text-decoration: none;
 }
 
 #main_title {
     text-align: center;
+    color: inherit
 }
 
 .diagram-1 {
     text-align: center;
+    border: 3px solid black;
+    background-color: grey;
 }
 
 .cgram-diagram1 {
-    width: 1000px;
-    height: 550px;
+    width: 1366px;
+    height: 400px;
 }
 
 .cgram-diagram2 {
@@ -28,6 +44,7 @@ p {
 
 button {
     margin-bottom: 30px;
+    border: none;
 }
 
 .remove_button {
