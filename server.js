@@ -19,7 +19,7 @@ app.get("/testing", (req, res) => {
 	res.sendFile(__dirname + "/pub/testing.html")
 })
 
-app.get('/documentation', (req, res) => {
+app.get('/API', (req, res) => {
 	res.sendFile(__dirname + '/pub/docs/index.html')
 })
 
