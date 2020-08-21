@@ -89,7 +89,9 @@
                 log("The blobs are already connected")
                 return null
             }
-            this.edges.push(new Edge(this.root_html, type, blob1, blob2, color, stroke_width))
+            const newEdge = new Edge(this.root_html, type, blob1, blob2, color, stroke_width)
+            this.edges.push(newEdge)
+            return newEdge;
         }
 
         disconnect(blob1, blob2) {
@@ -282,7 +284,7 @@
         }
 
         removeEdgeFromDOM(edge) {
-            edge.html.remove();
+            edge.html.node().parentNode.remove();
         }
 
         /* Drag Functions */
@@ -464,6 +466,7 @@
             for (let i=0; i < edges.length; i++) {
                 edges[i].calculatePositions()
                 this.updateEdgePositions(edges[i])
+                this.updateEdgeLabel(edges[i])
             }
         }
 
@@ -565,6 +568,34 @@
             .attr("y1", edge.y1)
             .attr("x2", edge.x2)
             .attr("y2", edge.y2)
+        }
+
+        updateEdgeLabel(edge) {
+            const x = (edge.x2+edge.x1)/ 2
+            const y = (edge.y2+edge.y1)/2
+            const rotateValueRadians = Math.atan(Math.abs((edge.y2-edge.y1))/Math.abs((edge.x2-edge.x1)))
+            let rotateValue;
+            if (edge.x2 > edge.x1) {
+                if (edge.y2 > edge.y1) {
+                    rotateValue = rotateValueRadians * (180/Math.PI)
+                }
+                else {
+                    rotateValue = (rotateValueRadians * (180/Math.PI))*-1
+                }
+            }
+            else {
+                if (edge.y2 > edge.y1) {
+                    rotateValue = rotateValueRadians * (180/Math.PI)*-1
+                }
+                else {
+                    rotateValue = (rotateValueRadians * (180/Math.PI))
+                }
+            }
+            const rotatelabel = "rotate(" + rotateValue + ", " + x + "," + y + ") "
+            d3.select(edge.html.node().parentElement).select("text")
+            .attr("x", x)
+            .attr("y", (edge.y2+edge.y1 - edge.stroke_width)/2)
+            .attr("transform", rotatelabel)
         }
 
         changeBlobColor(blobDOM, newColor) {
@@ -745,6 +776,7 @@
             this.to = to;
             this.color = color;
             this.stroke_width = stroke_width;
+            this.label = "";
             this.x1 = 0;
             this.y1 = 0;
             this.x2 = 0;
@@ -805,7 +837,7 @@
             else {
                 edgeStroke = ""
             }
-            return root_html.insert("line", ":first-child")
+            return root_html.insert("g", ":first-child").append("line")
             .attr("x1", edge.x1)
             .attr("y1", edge.y1)
             .attr("x2", edge.x2)
@@ -815,6 +847,95 @@
             .attr("stroke-dasharray", edgeStroke)
         }
 
+        addLabel(label, font_family, font_size, color="black") {
+            if (this.label === "") {
+                this.label = label
+                this.addLabeltoEdge(this, label, font_family, font_size, color)
+            } else {
+                this.label = this.label + " " + label
+                this.addToLabel(this, this.label, font_family, font_size, color)
+            }
+        }
+
+        addLabeltoEdge(edge, label, font_family, font_size, color) {
+            const x = (edge.x2+edge.x1)/ 2
+            const y = (edge.y2+edge.y1)/2
+            const rotateValueRadians = Math.atan(Math.abs((edge.y2-edge.y1))/Math.abs((edge.x2-edge.x1)))
+            let rotateValue;
+            if (edge.x2 > edge.x1) {
+                if (edge.y2 > edge.y1) {
+                    rotateValue = rotateValueRadians * (180/Math.PI)
+                }
+                else {
+                    rotateValue = (rotateValueRadians * (180/Math.PI))*-1
+                }
+            }
+            else {
+                if (edge.y2 > edge.y1) {
+                    rotateValue = rotateValueRadians * (180/Math.PI)*-1
+                }
+                else {
+                    rotateValue = (rotateValueRadians * (180/Math.PI))
+                }
+            }
+            const rotatelabel = "rotate(" + rotateValue + ", " + x + "," + y + ") "
+            d3.select(edge.html.node().parentElement).append("text")
+            .attr("x", x)
+            .attr("y", (edge.y2+edge.y1 - edge.stroke_width)/2)
+            .attr("transform", rotatelabel)
+            .style("font-family", font_family)
+            .style("font-size", font_size)
+            .attr("fill", color)
+            .text(label)
+        }
+
+        addToLabel(edge, label, font_family, font_size, color) {
+            const x = (edge.x2+edge.x1)/ 2
+            const y = (edge.y2+edge.y1)/2
+            const rotateValueRadians = Math.atan(Math.abs((edge.y2-edge.y1))/Math.abs((edge.x2-edge.x1)))
+            let rotateValue;
+            if (edge.x2 > edge.x1) {
+                if (edge.y2 > edge.y1) {
+                    rotateValue = rotateValueRadians * (180/Math.PI)
+                }
+                else {
+                    rotateValue = (rotateValueRadians * (180/Math.PI))*-1
+                }
+            }
+            else {
+                if (edge.y2 > edge.y1) {
+                    rotateValue = rotateValueRadians * (180/Math.PI)*-1
+                }
+                else {
+                    rotateValue = (rotateValueRadians * (180/Math.PI))
+                }
+            }
+            const rotatelabel = "rotate(" + rotateValue + ", " + x + "," + y + ") "
+            d3.select(edge.html.node().parentElement).select("text")
+            .attr("x", x)
+            .attr("y", (edge.y2+edge.y1 - edge.stroke_width)/2)
+            .attr("transform", rotatelabel)
+            .style("font-family", font_family)
+            .style("font-size", font_size)
+            .attr("fill", color)
+            .text(label)
+        }
+
+        // addTexttoBlob(blob, text, font_family, font_size, text_align, vertical_align, color) {
+        //     const xmlns = "http://www.w3.org/1999/xhtml"
+        //     d3.select(blob.html.node().parentNode).select("foreignObject")
+        //     .select("div")
+        //     .append("xhtml:div")
+        //     .style("display", "table-row")
+        //     .append("xhtml:p").text(text)
+        //     .attr("xmlns", xmlns)
+        //     .style("font-family", font_family)
+        //     .style("font-size", font_size)
+        //     .style("text-align", text_align)
+        //     .style("vertical-align", vertical_align)
+        //     .style("color", color)
+        //     .style("display", "table-cell")
+        // }
     }
 
     global.Connectogram = global.Connectogram || Connectogram
