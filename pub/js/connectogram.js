@@ -528,8 +528,8 @@
             const edges = this.cgram.getEdgesForBlob(this)
             for (let i=0; i < edges.length; i++) {
                 edges[i].calculatePositions()
-                this.updateEdgePositions(edges[i])
-                this.updateEdgeLabel(edges[i])
+                edges[i].updateEdgePositions();
+                edges[i].updateEdgeLabel()
             }
         }
 
@@ -539,7 +539,7 @@
             // Hide all Edges associated with Blob
             const edges = this.cgram.getEdgesForBlob(this)
             for (let i=0; i < edges.length; i++) {
-                this.toggleEdgeHide(edges[i].html)
+                edges[i].toggleEdgeHide();
             }
         }
 
@@ -639,48 +639,6 @@
             a.remove()
         }
 
-        // Update X and Y coordinates of the Edge DOM element based on the Edge element
-        updateEdgePositions(edge) {
-            edge.html
-            .attr("x1", edge.x1)
-            .attr("y1", edge.y1)
-            .attr("x2", edge.x2)
-            .attr("y2", edge.y2)
-        }
-
-        // Update Label positioning and rotation based on the Edge element
-        updateEdgeLabel(edge) {
-            // Center position of the edge
-            const x = (edge.x2+edge.x1)/ 2
-            const y = (edge.y2+edge.y1)/2
-            // Rotation value of the Label in Radians
-            const rotateValueRadians = Math.atan(Math.abs((edge.y2-edge.y1))/Math.abs((edge.x2-edge.x1)))
-            // Set to right-hand rotation or left-hand rotation based on the endpoints of the Edge
-            let rotateValue;
-            if (edge.x2 > edge.x1) {
-                if (edge.y2 > edge.y1) {
-                    rotateValue = rotateValueRadians * (180/Math.PI)
-                }
-                else {
-                    rotateValue = (rotateValueRadians * (180/Math.PI))*-1
-                }
-            }
-            else {
-                if (edge.y2 > edge.y1) {
-                    rotateValue = rotateValueRadians * (180/Math.PI)*-1
-                }
-                else {
-                    rotateValue = (rotateValueRadians * (180/Math.PI))
-                }
-            }
-            // Set the DOM's attributes
-            const rotatelabel = "rotate(" + rotateValue + ", " + x + "," + y + ") "
-            d3.select(edge.html.node().parentElement).select("text")
-            .attr("x", (edge.x2+edge.x1)/ 2 - 5*edge.label.length)
-            .attr("y", (edge.y2+edge.y1 - edge.stroke_width)/2)
-            .attr("transform", rotatelabel)
-        }
-
         // Change Style Properties
         changeBlobColor(blobDOM, newColor) {
             blobDOM.attr("fill", newColor)
@@ -713,16 +671,6 @@
                 d3.select(blobDOM.node().parentNode).select("foreignObject")
                 .selectAll("p")
                 .style("visibility", "hidden")
-            }
-        }
-
-        // Hide/Unhide the Edge's DOM element
-        toggleEdgeHide(edgeDOM) {
-            if (edgeDOM.attr("visibility") === "hidden") {
-                edgeDOM.attr("visibility", "visible")
-            }
-            else {
-                edgeDOM.attr("visibility", "hidden")
             }
         }
 
@@ -940,47 +888,34 @@
             .attr("stroke-dasharray", edgeStroke)
         }
 
+        // Hide/Unhide the Edge's DOM element
+        toggleEdgeHide() {
+            if (this.html.attr("visibility") === "hidden") {
+                this.html.attr("visibility", "visible")
+            }
+            else {
+                this.html.attr("visibility", "hidden")
+            }
+        }
+
         // Adds a label to the center of the Edge
         addLabel(label, font_family, font_size, color="black") {
             if (this.label === "") {
                 this.label = label
-                this.addLabeltoEdge(this, label, font_family, font_size, color)
+                this.addLabeltoEdge(label, font_family, font_size, color)
             } else {
                 this.label = this.label + " " + label
-                this.addToLabel(this, this.label, font_family, font_size, color)
+                this.addToLabel(this.label, font_family, font_size, color)
             }
         }
 
         // Appends a new Text element to the edge and calculates rotation/positoning
-        addLabeltoEdge(edge, label, font_family, font_size, color) {
-            // Center coordinates of the Edge
-            const x = (edge.x2+edge.x1)/ 2
-            const y = (edge.y2+edge.y1)/2
-            // Some Math to calculate rotations
-            const rotateValueRadians = Math.atan(Math.abs((edge.y2-edge.y1))/Math.abs((edge.x2-edge.x1)))
-            // Set to postive or negative based on Blob coordinates (righthand/lefthand rotations)
-            let rotateValue;
-            if (edge.x2 > edge.x1) {
-                if (edge.y2 > edge.y1) {
-                    rotateValue = rotateValueRadians * (180/Math.PI)
-                }
-                else {
-                    rotateValue = (rotateValueRadians * (180/Math.PI))*-1
-                }
-            }
-            else {
-                if (edge.y2 > edge.y1) {
-                    rotateValue = rotateValueRadians * (180/Math.PI)*-1
-                }
-                else {
-                    rotateValue = (rotateValueRadians * (180/Math.PI))
-                }
-            }
+        addLabeltoEdge(label, font_family, font_size, color) {
             // Add the Label to the DOM
-            const rotatelabel = "rotate(" + rotateValue + ", " + x + "," + y + ") "
-            d3.select(edge.html.node().parentElement).append("text")
-            .attr("x", (edge.x2+edge.x1)/ 2 - 5*label.length)
-            .attr("y", (edge.y2+edge.y1 )/2 - edge.stroke_width)
+            const rotatelabel = this.getRotateLabel()
+            d3.select(this.html.node().parentElement).append("text")
+            .attr("x", (this.x2+this.x1)/ 2 - 5*label.length)
+            .attr("y", (this.y2+this.y1 )/2 - this.stroke_width)
             .attr("transform", rotatelabel)
             .style("font-family", font_family)
             .style("font-size", font_size)
@@ -989,13 +924,37 @@
         }
 
         // Same as addLabeltoEdge() method, but adds to already existing Label
-        addToLabel(edge, label, font_family, font_size, color) {
-            const x = (edge.x2+edge.x1)/ 2
-            const y = (edge.y2+edge.y1)/2
-            const rotateValueRadians = Math.atan(Math.abs((edge.y2-edge.y1))/Math.abs((edge.x2-edge.x1)))
+        addToLabel(label, font_family, font_size, color) {
+            const rotatelabel = this.getRotateLabel()
+            d3.select(this.html.node().parentElement).select("text")
+            .attr("x", (this.x2+edge.x1)/ 2 - 5*label.length)
+            .attr("y", (this.y2+edge.y1 - this.stroke_width)/2)
+            .attr("transform", rotatelabel)
+            .style("font-family", font_family)
+            .style("font-size", font_size)
+            .attr("fill", color)
+            .text(label)
+        }
+
+        // Update Label positioning and rotation based on the Edge element
+        updateEdgeLabel() {
+            const rotatelabel = this.getRotateLabel()
+            d3.select(this.html.node().parentElement).select("text")
+            .attr("x", (this.x2+this.x1)/ 2 - 5*this.label.length)
+            .attr("y", (this.y2+this.y1 - this.stroke_width)/2)
+            .attr("transform", rotatelabel)
+        }
+        
+        getRotateLabel() {
+            // Center coordinates of the Edge
+            const x = (this.x2+this.x1)/ 2
+            const y = (this.y2+this.y1)/2
+            // Some Math to calculate rotations
+            const rotateValueRadians = Math.atan(Math.abs((this.y2-this.y1))/Math.abs((this.x2-this.x1)))
+            // Set to postive or negative based on Blob coordinates (righthand/lefthand rotations)
             let rotateValue;
-            if (edge.x2 > edge.x1) {
-                if (edge.y2 > edge.y1) {
+            if (this.x2 > this.x1) {
+                if (this.y2 > this.y1) {
                     rotateValue = rotateValueRadians * (180/Math.PI)
                 }
                 else {
@@ -1003,22 +962,24 @@
                 }
             }
             else {
-                if (edge.y2 > edge.y1) {
+                if (this.y2 > this.y1) {
                     rotateValue = rotateValueRadians * (180/Math.PI)*-1
                 }
                 else {
                     rotateValue = (rotateValueRadians * (180/Math.PI))
                 }
             }
-            const rotatelabel = "rotate(" + rotateValue + ", " + x + "," + y + ") "
-            d3.select(edge.html.node().parentElement).select("text")
-            .attr("x", (edge.x2+edge.x1)/ 2 - 5*label.length)
-            .attr("y", (edge.y2+edge.y1 - edge.stroke_width)/2)
-            .attr("transform", rotatelabel)
-            .style("font-family", font_family)
-            .style("font-size", font_size)
-            .attr("fill", color)
-            .text(label)
+            // Add the Label to the DOM
+            return "rotate(" + rotateValue + ", " + x + "," + y + ") "
+        }
+
+        // Update X and Y coordinates of the Edge DOM element based on the Edge element
+        updateEdgePositions() {
+            this.html
+            .attr("x1", this.x1)
+            .attr("y1", this.y1)
+            .attr("x2", this.x2)
+            .attr("y2", this.y2)
         }
     }
 

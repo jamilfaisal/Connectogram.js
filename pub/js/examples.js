@@ -19,16 +19,16 @@ const edge4 = cg.connect(blobCirc, blobRect2, null, "brown", 3)
 edge4.addLabel("HELLOOHELLOO", "Verdana", "20px", "red")
 
 // Text
-blobRect.addText("Large Text", "Verdana", "40px", "left", "black")
-blobRect.addText("Normal Text", "Verdana", "20px", "left", "black")
-blobRect.addText("Small Text", "Verdana", "7px", "left", "black")
+blobRect.addText("Large Text", "Verdana", "40px", "left", "top", "black")
+blobRect.addText("Normal Text", "Verdana", "20px", "left", "middle", "black")
+blobRect.addText("Small Text", "Verdana", "7px", "left", "bottom", "black")
 blobRect.addText("Multiple sizes of text can be inserted here.", "Verdana", "20px", "left", "black")
-// blobCirc.addText("Left Text", "Times New Roman", "20px", "left", "black")
-// blobCirc.addText("Center Text", "Courier", "20px", "center", "bottom", "black")
-// blobCirc.addText("Right Text", "Arial", "20px", "right", "black")
-blobEllip.addText("Multiple", "Sans-Serif", "20px", "center", "blue")
-blobEllip.addText("different", "Sans-Serif", "20px", "left", "darkgreen")
-blobEllip.addText("colors!", "Sans-Serif", "20px", "right", "yellow")
+blobCirc.addText("Left Text", "Times New Roman", "20px", "left", "black")
+blobCirc.addText("Center Text", "Courier", "20px", "center", "bottom", "black")
+blobCirc.addText("Right Text", "Arial", "20px", "right", "black")
+blobEllip.addText("Multiple", "Sans-Serif", "20px", "center", "top", "blue")
+blobEllip.addText("different", "Sans-Serif", "20px", "left", "middle", "darkgreen")
+blobEllip.addText("colors!", "Sans-Serif", "20px", "right", "bottom", "yellow")
 // blobEllip.clearText()
 // Draggable
 blobRect.toggleDraggable();
@@ -54,10 +54,10 @@ linkRect2.setLink("http://corndog.io/")
 const colorEllip = cg2.addBlob("colorEllip", "ellipse", {radiusx: 100, radiusy: 30}, 765, 100, "black", "black")
 // Alert
 const alertCircle = cg2.addBlob("alertCirc", "circle", {radius: 55}, 955, 100, "turquoise", "red")
-alertCircle.addText("Click me!", "Arial", "27px", "center", "red")
+alertCircle.addText("Click me!", "Arial", "27px", "center", "middle", "red")
 alertCircle.addEvent("click", function() {
     alert("This is a callback function. You can add events to all the shapes!")
-    log("This is a secret message...")
+    console.log("This is a secret message...")
 })
 // Magic!
 const magicRect = cg2.addBlob("magicRect", "rectangle", {width: 150, height: 90}, 1085, 75, "black", "black")
