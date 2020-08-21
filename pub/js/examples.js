@@ -10,13 +10,13 @@ const blobCirc = cg.addBlob("blobCirc", "circle", {radius: 30}, 550, 125, "pink"
 const blobEllip = cg.addBlob("blobEllip", "ellipse", {radiusx: 150, radiusy: 80}, 450, 400, "INDIANRED", "blue")
 // Edges
 const edge1 = cg.connect(blobRect, blobRect2, "dotted", "blue", 10)
-edge1.addLabel("HELLOO", "Verdana", "20px", "red")
+edge1.addLabel("HELLOOHELLOO", "Verdana", "20px", "red")
 const edge2 = cg.connect(blobCirc, blobEllip, "dashed", "red", 10)
-edge2.addLabel("HELLOO", "Verdana", "20px", "red")
+edge2.addLabel("HELLOOHELLOO", "Verdana", "20px", "red")
 const edge3 = cg.connect(blobCirc, blobRect, null, "green", 1)
-edge3.addLabel("HELLOO", "Verdana", "20px", "red")
+edge3.addLabel("HELLOOHELLOO", "Verdana", "20px", "red")
 const edge4 = cg.connect(blobCirc, blobRect2, null, "brown", 3)
-edge4.addLabel("HELLOO", "Verdana", "20px", "red")
+edge4.addLabel("HELLOOHELLOO", "Verdana", "20px", "red")
 
 // Text
 blobRect.addText("Large Text", "Verdana", "40px", "left", "black")

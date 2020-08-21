@@ -593,7 +593,7 @@
             }
             const rotatelabel = "rotate(" + rotateValue + ", " + x + "," + y + ") "
             d3.select(edge.html.node().parentElement).select("text")
-            .attr("x", x)
+            .attr("x", (edge.x2+edge.x1)/ 2 - 5*edge.label.length)
             .attr("y", (edge.y2+edge.y1 - edge.stroke_width)/2)
             .attr("transform", rotatelabel)
         }
@@ -880,8 +880,8 @@
             }
             const rotatelabel = "rotate(" + rotateValue + ", " + x + "," + y + ") "
             d3.select(edge.html.node().parentElement).append("text")
-            .attr("x", x)
-            .attr("y", (edge.y2+edge.y1 - edge.stroke_width)/2)
+            .attr("x", (edge.x2+edge.x1)/ 2 - 5*label.length)
+            .attr("y", (edge.y2+edge.y1 )/2 - edge.stroke_width)
             .attr("transform", rotatelabel)
             .style("font-family", font_family)
             .style("font-size", font_size)
@@ -912,7 +912,7 @@
             }
             const rotatelabel = "rotate(" + rotateValue + ", " + x + "," + y + ") "
             d3.select(edge.html.node().parentElement).select("text")
-            .attr("x", x)
+            .attr("x", (edge.x2+edge.x1)/ 2 - 5*label.length)
             .attr("y", (edge.y2+edge.y1 - edge.stroke_width)/2)
             .attr("transform", rotatelabel)
             .style("font-family", font_family)
