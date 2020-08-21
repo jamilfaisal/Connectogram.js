@@ -200,8 +200,10 @@
 
         /* DOM Functions */
         addRoottoDOM(after_html, className) {
+            const self = this;
             const svg = d3.select(after_html).insert("svg")
             .classed(className, true)
+            .on("load", this.makeDraggable.bind(this));
             return svg
         }
 
@@ -271,8 +273,89 @@
             edge.html.remove();
         }
 
-        // Misc. Functions
+        /* Drag Functions */
+        // Logic inherited from http://www.petercollingridge.co.uk/tutorials/svg/interactive/dragging/
+        makeDraggable() {
+            const svg = d3.event.target;
+            const self = this   // Connectogram
+            svg.addEventListener('mousedown', startDrag);
+            svg.addEventListener('mousemove', drag);
+            svg.addEventListener('mouseup', endDrag);
+            svg.addEventListener('mouseleave', endDrag);
+            
+            let selectedHTMLElement = null;
+            let offset = null;
+            let selectedBlob = null;
+            function startDrag(evt) {
+                const target = evt.target;
+                let group = null;
+                if (target.nodeName === "P") {
+                    group = target.parentElement.parentElement;
+                }
+                else if (target.nodeName === "foreignObject" || target.nodeName === "rect" || target.nodeName === "ellipse" || target.nodeName === "circle") {
+                    group = target.parentElement;
+                }
+                else {
+                    group = null;
+                }
+                if (group && group.classList.contains("cg-draggable")) {
+                    selectedBlob = getBlobFromDOM(group.firstChild);
+                    if (selectedBlob) {
+                        selectedHTMLElement = group.firstChild;
+                    }
+                    offset = getMousePosition(evt);
+                    offset.x -= parseFloat(selectedHTMLElement.getAttributeNS(null, "x"));
+                    offset.y -= parseFloat(selectedHTMLElement.getAttributeNS(null, "y"));
+                }
+            }
 
+            function drag(evt) {
+                if (selectedHTMLElement && selectedBlob) {
+                    evt.preventDefault();
+                    const coord = getMousePosition(evt);
+                    let newX = null;
+                    let newY = null; 
+                    if (selectedBlob.shape === "rectangle") {
+                        newX = coord.x - offset.x;
+                        newY = coord.y - offset.y
+                    }
+                    else if (selectedBlob.shape === "circle" || selectedBlob.shape === "ellipse") {
+                        newX = coord.x;
+                        newY = coord.y;
+                    }
+                    selectedHTMLElement.setAttributeNS(null, "x", newX);
+                    selectedHTMLElement.setAttributeNS(null, "y", newY);
+                    selectedBlob.setPosition(newX, newY)
+                }
+            }
+
+            function endDrag(evt) {
+                selectedHTMLElement = null;
+                selectedBlob = null;
+            }
+
+            function getBlobFromDOM(blobDOM) {
+                const blobs = self.blobs.filter((blob) => {
+                    return blob.html.node() === blobDOM
+                })
+                if (blobs.length > 0) {
+                    return blobs[0]
+                } else {
+                    return null;
+                }
+            }
+
+            function getMousePosition(evt) {
+                const CTM = svg.getScreenCTM();
+                return {
+                    x: (evt.clientX - CTM.e) / CTM.a,
+                    y: (evt.clientY - CTM.f) / CTM.d
+                };
+            }
+        }
+
+        // Misc. Functions
+        
         // Check if the object is empty
         isEmpty(obj) {
             return Object.keys(obj).length === 0;
@@ -288,12 +371,11 @@
             this.y = y;
             this.color = color;
             this.borderColor = borderColor;
-            this.numRows = 0;   // Implement later
-            this.numCols = 0;   // Implement later
             this.html = null;
             this.text = "";
             this.link = "";
             this.func = {};
+            this.draggable = false;
         }
 
         addText(text, font_family, font_size, text_align="left", color="black") {
@@ -391,7 +473,24 @@
             this.removeEventFromBlob(this.html, eventListener)
         }
 
+        toggleDraggable() {
+            this.draggable = !this.draggable;
+            if (this.draggable) {
+                this.setDraggable(this.html);
+            } else {
+                this.unsetDraggable(this.html)
+            }
+        }
+
         /* DOM Functions */
+        
+        setDraggable(blobDOM) {
+            d3.select((blobDOM.node().parentNode)).classed('cg-draggable', true)
+        }
+
+        unsetDraggable(blobDOM) {
+            d3.select((blobDOM.node().parentNode)).classed('cg-draggable', false)
+        }
 
         addTexttoBlob(blob, text, font_family, font_size, text_align, color) {
             const xmlns = "http://www.w3.org/1999/xhtml"

@@ -26,7 +26,10 @@ function examples() {
     blobEllip.addText("Multiple", "Sans-Serif", "20px", "center", "blue")
     blobEllip.addText("different", "Sans-Serif", "20px", "left", "darkgreen")
     blobEllip.addText("colors!", "Sans-Serif", "20px", "right", "yellow")
-
+    // Draggable
+    blobRect.toggleDraggable();
+    blobCirc.toggleDraggable();
+    blobEllip.toggleDraggable();
     // Diagram 2 Code
     const after_html2 = document.querySelector(".diagram-2")
     const cg2 = new Connectogram(after_html2, "diagram2")

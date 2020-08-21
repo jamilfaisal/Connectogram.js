@@ -56,3 +56,11 @@ button {
       opacity: 1;
     }
   }
+
+.cg-draggable {
+    cursor: move
+}
+
+foreignObject * {
+    pointer-events: none;
+}
