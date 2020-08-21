@@ -8,15 +8,15 @@ const app = express();
 app.use(express.static(__dirname + '/pub'))
 
 app.get("/", (req, res) => {
-	res.sendFile(__dirname + "/pub/welcome.html")
+	res.sendFile(__dirname + "/pub/welcome/welcome.html")
 })
 
 app.get("/examples", (req, res) => {
-	res.sendFile(__dirname + "/pub/examples.html")
+	res.sendFile(__dirname + "/pub/examples/examples.html")
 })
 
 app.get("/testing", (req, res) => {
-	res.sendFile(__dirname + "/pub/testing.html")
+	res.sendFile(__dirname + "/pub/testing/testing.html")
 })
 
 app.get('/API', (req, res) => {

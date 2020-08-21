@@ -1,0 +1,34 @@
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: lemonchiffon;
+}
+.title_div {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -150px;
+    margin-left: -300px;
+    background-color: cadetblue;
+    border-radius: 10px 10px 10px 10px;
+    padding: 15px;
+    padding-bottom: 15px;
+    text-align: center;
+}
+
+#main_title {
+    text-align: center;
+    font-size: 75px;
+    margin-bottom: 30px;
+}
+
+.div_links {
+    text-align: center;
+    display: inline;
+    font-size: larger;
+}
+
+.div_links a {
+    padding: 1vw;
+    text-decoration: none;
+    position: relative;
+}
