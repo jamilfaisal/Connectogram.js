@@ -8,6 +8,11 @@ const blobRect = cg.addBlob("blobRect1", "rectangle", {height: 175, width: 100},
 const blobRect2 = cg.addBlob("blobRect2", "rectangle", {height: 150, width: 140}, 850, 400, "black", "red")
 const blobCirc = cg.addBlob("blobCirc", "circle", {radius: 30}, 550, 125, "pink", "purple")
 const blobEllip = cg.addBlob("blobEllip", "ellipse", {radiusx: 150, radiusy: 80}, 450, 400, "INDIANRED", "blue")
+// Anchors
+const anchor1 = cg.addAnchor("anchor1", 3, 140, 200, "white")
+anchor1.toggleDraggable()
+anchor1.changeRadius(10)
+anchor1.changeColor("blue")
 // Edges
 const edge1 = cg.connect(blobRect, blobRect2, "dotted", "blue", 10)
 edge1.addLabel("HELLOOHELLOO", "Verdana", "20px", "red")
@@ -17,6 +22,8 @@ const edge3 = cg.connect(blobCirc, blobRect, null, "green", 1)
 edge3.addLabel("HELLOOHELLOO", "Verdana", "20px", "red")
 const edge4 = cg.connect(blobCirc, blobRect2, null, "brown", 3)
 edge4.addLabel("HELLOOHELLOO", "Verdana", "20px", "red")
+const edge5 = cg.connect(anchor1, blobCirc,null, "pink",  2)
+const edge6 = cg.connect(anchor1, blobRect,null, "pink",  2)
 
 // Text
 blobRect.addText("Large Text", "Verdana", "40px", "left", "top", "black")

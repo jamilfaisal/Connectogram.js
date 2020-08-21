@@ -8,6 +8,7 @@
             this.className = "cgram-" + name    // For CSS Styling
             this.blobs = [];    // Stores a list of all blobs in this diagram
             this.edges = [];    // Stores a list of all connections between blobs
+            this.anchors = [];
             this.root_html = this.addRoottoDOM(after_html, this.className)  // refernce to d3.js element
         }
 
@@ -58,6 +59,27 @@
             return newBlob
         }
 
+        addAnchor(name=null, radius=0, x=0, y=0, color="white") {
+            // Edge Cases
+            if (name === null) {
+                log("Could not instantiate Anchor. Name missing.")
+                return null
+            }
+            // Check for duplicates
+            if (this.getAnchor(name) !== null) {
+                log("Duplicate name found. Choose a different name for your anchor.")
+                return null
+            }
+            // Create new Anchor based on shape
+            const newAnchor = new Anchor(this, name, "anchor", radius, x, y, color);
+            // Add to DOM
+            newAnchor.html = this.addAnchortoDOM(this.root_html, newAnchor)
+            // Add to Blob List
+            this.anchors.push(newAnchor)
+            // Return a reference to the new Blob
+            return newAnchor
+        }
+
         // Remove a Blob by its unique name
         removeBlob(name) {
             // Get the Blob
@@ -82,6 +104,30 @@
             this.removeBlobFromDOM(blobToRemove);
         }
 
+        removeAnchor(name) {
+            // Get the Anchor
+            const anchorToRemove = this.getAnchor(name);
+            if (anchorToRemove === null) {
+                log("Anchor not found.")
+                return null;
+            }
+            // Remove all edges associated with it
+            const edges = this.getEdgesForBlob(anchorToRemove)
+            console.log(edges)
+            for (let i=0; i < edges.length; i++) {
+                this.edges = this.edges.filter(function(edge) {
+                    return edges[i] !== edge;
+                })
+                this.removeEdgeFromDOM(edges[i])
+            }
+            // Remove the anchor
+            this.anchors = this.anchors.filter(function(anchor) {
+                return anchor !== anchorToRemove
+            })
+            // Remove from the DOM
+            this.removeAnchorFromDOM(anchorToRemove);
+        }
+
         // Return a reference to the Blob by its unique name
         getBlob(name) {
             const blob = this.blobs.filter(function(blob) {
@@ -95,12 +141,38 @@
             }
         }
 
+        // Return a reference to the Anchor by its Unique name
+        getAnchor(name) {
+            const anchor = this.anchors.filter(function(anchor) {
+                return anchor.name === name
+            })
+            if (anchor.length === 0) {
+                return null
+            } else {
+                return anchor[0]
+            }
+        }
+
         // Create an Edge between two Blobs
         connect(blob1, blob2, type="default", color="black", stroke_width=2) {
+            // Can't connect to self
+            if (blob1 === blob2) {
+                log("Same blobs...")
+                return null;
+            }
             // Edge must be unique
             if (this.getEdge(blob1, blob2) !== null) {
                 log("The blobs are already connected")
                 return null
+            }
+            // Make sure both blobs exist
+            if (!(this.getAnchor(blob1.name) || this.getBlob(blob1.name))) {
+                log("The first blob/anchor does not exist in the diagram")
+                return null;
+            }
+            if (!(this.getAnchor(blob2.name) || this.getBlob(blob2.name))) {
+                log("The second blob/anchor does not exist in the diagram")
+                return null;
             }
             // Create the edge
             const newEdge = new Edge(this.root_html, type, blob1, blob2, color, stroke_width)
@@ -138,7 +210,7 @@
             }
         }
 
-        // Get all Edges associated with a Blob
+        // Get all Edges associated with a Blob/Anchor
         getEdgesForBlob(blob) {
             const edges = this.edges.filter(function(edge) {
                 return (edge.from === blob || edge.to === blob)
@@ -168,6 +240,30 @@
             blob.name = newName;
             log("Name Changed.")
             return blob
+        }
+
+        // Change the Anchor's unique name
+        changeAnchorName(oldName, newName) {
+            // Edge Cases
+            if (oldName === newName) {
+                log("Same name.")
+                return null
+            }
+            // Get the Anchor
+            const anchor = this.getAnchor(oldName)
+            if (anchor === null) {
+                log("Anchor not found.")
+                return null;
+            }
+            // Check if name is unique
+            if (this.getAnchor(newName) !== null) {
+                log("Name already exists.")
+                return null
+            }
+            // Set the new Name
+            anchor.name = newName;
+            log("Name Changed.")
+            return anchor
         }
 
         // Display information on all Blobs
@@ -313,9 +409,28 @@
             }
         }
 
+        // Add the anchor to the DOM and return a reference to the d3.js element
+        // Uses d3.js to append an SVG element to the DOM
+        addAnchortoDOM(root_html, anchor) {
+            // Create a group
+            const group = root_html.append("g")
+            // Add anchor
+            const anchorDOM = group.append("circle")
+            .attr("r", anchor.radius)
+            .attr("cx", anchor.x)
+            .attr("cy", anchor.y)
+            .attr("fill", anchor.color)
+            return anchorDOM
+        }
+
         // Remove the Blob DOM element using d3.js
         removeBlobFromDOM(blob) {
-            blob.html.node().parentNode.remove()
+            blob.html.node().parentNode.remove();
+        }
+
+        // Remove the Anchor DOM element using d3.js
+        removeAnchorFromDOM(anchor) {
+            anchor.html.node().parentNode.remove();
         }
 
         // Remove the Edge DOM element using d3.js
@@ -376,7 +491,7 @@
                         newX = coord.x - offset.x;
                         newY = coord.y - offset.y
                     }
-                    else if (selectedBlob.shape === "circle" || selectedBlob.shape === "ellipse") {
+                    else if (selectedBlob.shape === "circle" || selectedBlob.shape === "ellipse" || selectedBlob.shape === "anchor") {
                         newX = coord.x;
                         newY = coord.y;
                     }
@@ -401,6 +516,12 @@
                 })
                 if (blobs.length > 0) {
                     return blobs[0]
+                }
+                const anchors = self.anchors.filter((anchor) => {
+                    return anchor.html.node() === blobDOM
+                })
+                if (anchors.length > 0) {
+                    return anchors[0]
                 } else {
                     return null;
                 }
@@ -421,6 +542,135 @@
         // Check if the object is empty
         isEmpty(obj) {
             return Object.keys(obj).length === 0;
+        }
+    }
+
+    // Anchor Class
+    class Anchor {
+        constructor(cgram, name, shape, radius, x, y, color) {
+            this.cgram = cgram; // Reference to its Connectogram
+            this.name = name;   // Unique name identifier
+            this.shape = shape; // "anchor"
+            // Radius
+            this.radius = radius;
+            // x and y coordinates
+            this.x = x; 
+            this.y = y;
+            // Style properties
+            this.color = color;
+            this.html = null;   // Reference to the DOM element
+            this.draggable = false; // Whether element is draggable or not
+        }
+
+        // Get coordinates and dimensions
+        getCenterX() {
+            return this.x;
+        }
+
+        getCenterY() {
+            return this.y
+        }
+
+        getWidth() {
+            return 2*this.radius
+        }
+
+        getHeight() {
+            return 2*this.radius
+        }
+
+        // Update the unique Name
+        changeName(newName) {
+            this.cgram.changeAnchorName(this.name, newName);
+        }
+
+        // Set to a new Radius
+        changeRadius(newRadius=this.radius) {
+            this.radius = newRadius;
+            this.changeAnchorRadius(this.html, newRadius);
+            // Update Edges
+            this.updateEdges()
+        }
+
+        // Change Style Properties
+        changeColor(newColor=this.color) {
+            this.color = newColor;
+            this.changeAnchorColor(this.html, newColor);
+        }
+
+        // Update position in Connectogram (used in dragging functions as well)
+        setPosition(newX=this.x, newY=this.y) {
+            this.x = newX;
+            this.y = newY;
+            this.updateEdges()  // Update Edge positions
+            this.setAnchorPostion(this, newX, newY); // Update DOM element
+        }
+
+        // Update Edge locations
+        updateEdges() {
+            // Get all edges
+            const edges = this.cgram.getEdgesForBlob(this)
+            for (let i=0; i < edges.length; i++) {
+                edges[i].calculatePositions()
+                edges[i].updateEdgePositions();
+                edges[i].updateEdgeLabel()
+            }
+        }
+
+        // Hide or Unhide Blob Element
+        toggleHide() {
+            this.toggleBlobHide(this.html);
+            // Hide all Edges associated with Blob
+            const edges = this.cgram.getEdgesForBlob(this)
+            for (let i=0; i < edges.length; i++) {
+                edges[i].toggleEdgeHide();
+            }
+        }
+        
+        /* DOM Manipulation - using d3.js */
+        // Change Style Properties
+        changeAnchorColor(anchorDOM, newColor) {
+            anchorDOM.attr("fill", newColor)
+        }
+
+        // Set the Anchor's DOM element's positioning based on the Anchor element
+        setAnchorPostion(anchor, newX, newY) {
+            anchor.html.attr("cx", newX).attr("cy", newY);
+        }
+
+        // Change Anchor DOM's element to be hidden or unhidden
+        toggleBlobHide(anchorDOM) {
+            if (anchorDOM.attr('visibility') === "hidden") {
+                anchorDOM.attr("visibility", "visibile")
+            }
+            else {
+                anchorDOM.attr("visibility", "hidden")
+            }
+        }
+
+        // Set or Unset the Anchor element to be draggable
+        toggleDraggable() {
+            this.draggable = !this.draggable;
+            if (this.draggable) {
+                this.setDraggable(this.html);
+            } else {
+                this.unsetDraggable(this.html)
+            }
+        }
+
+        /* DOM functions using d3.js */
+        changeAnchorRadius(anchorDOM, newRadius) {
+            anchorDOM.attr("r", newRadius)
+        }
+
+        // Update the Mouse cursor styling
+        setDraggable(anchorDOM) {
+            d3.select((anchorDOM.node().parentNode)).classed('cg-draggable', true)
+        }
+
+        // Update the Mouse cursor styling
+        unsetDraggable(anchorDOM) {
+            d3.select((anchorDOM.node().parentNode)).classed('cg-draggable', false)
         }
     }
 
