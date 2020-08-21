@@ -84,12 +84,12 @@
             }
         }
 
-        connect(blob1, blob2, color="black", stroke_width=2) {
+        connect(blob1, blob2, type="default", color="black", stroke_width=2) {
             if (this.getEdge(blob1, blob2) !== null) {
                 log("The blobs are already connected")
                 return null
             }
-            this.edges.push(new Edge(this.root_html, "default", blob1, blob2, color, stroke_width))
+            this.edges.push(new Edge(this.root_html, type, blob1, blob2, color, stroke_width))
         }
 
         disconnect(blob1, blob2) {
@@ -224,6 +224,10 @@
                 .attr("y", blob.y)
                 .attr('width', blob.width)
                 .attr("height", blob.height)
+                .append("xhtml:div")
+                .style("display", "table")
+                .style('width', blob.width + "px")
+                .style("height", blob.height + "px")
                 return blobDOM
             }
             else if (blob.shape === "circle") {
@@ -240,6 +244,10 @@
                 .attr("y", blob.y - blob.radius/1.4)
                 .attr('width', blob.radius*1.4)
                 .attr("height", blob.radius*1.4)
+                .append("xhtml:div")
+                .style("display", "table")
+                .style('width', blob.radius*1.4 + "px")
+                .style("height", blob.radius*1.4 + "px")
                 return blobDOM
             }
             else if (blob.shape === "ellipse") {
@@ -257,6 +265,10 @@
                 .attr("y", blob.y - blob.radiusy/1.4)
                 .attr('width', blob.radiusx*1.4)
                 .attr("height", blob.radiusy*1.4)
+                .append("xhtml:div")
+                .style("display", "table")
+                .style('width', blob.radiusx*1.4 + "px")
+                .style("height", blob.radiusy*1.4 + "px")
                 return blobDOM
             }
             else {
@@ -378,14 +390,14 @@
             this.draggable = false;
         }
 
-        addText(text, font_family, font_size, text_align="left", color="black") {
+        addText(text, font_family, font_size, text_align="left", vertical_align="top", color="black") {
             if (this.text === "") {
                 this.text = text;
             }
             else {
                 this.text = this.text + "\n" + text
             }
-            this.addTexttoBlob(this, text, font_family, font_size, text_align, color)
+            this.addTexttoBlob(this, text, font_family, font_size, text_align, vertical_align, color)
         }
 
         textAlign(newTextAlign) {
@@ -492,15 +504,20 @@
             d3.select((blobDOM.node().parentNode)).classed('cg-draggable', false)
         }
 
-        addTexttoBlob(blob, text, font_family, font_size, text_align, color) {
+        addTexttoBlob(blob, text, font_family, font_size, text_align, vertical_align, color) {
             const xmlns = "http://www.w3.org/1999/xhtml"
             d3.select(blob.html.node().parentNode).select("foreignObject")
+            .select("div")
+            .append("xhtml:div")
+            .style("display", "table-row")
             .append("xhtml:p").text(text)
             .attr("xmlns", xmlns)
             .style("font-family", font_family)
             .style("font-size", font_size)
             .style("text-align", text_align)
+            .style("vertical-align", vertical_align)
             .style("color", color)
+            .style("display", "table-cell")
         }
 
         updateTextPosition(blobDOM, x, y, width, height) {
@@ -517,8 +534,8 @@
         }
 
         removeTextFromBlob(blob) {
-            d3.select(blob.html.node().parentNode).select("foreignObject")
-            .selectAll("p").remove()
+            d3.select(blob.html.node().parentNode).select("foreignObject").select("div")
+            .selectAll("div").remove()
         }
 
         setLinktoBlob(blobDOM, link) {
@@ -778,6 +795,16 @@
 
         /* DOM Functions */
         addEdgetoDOM(root_html, edge) {
+            let edgeStroke = null
+            if (edge.type === "dotted") {
+                edgeStroke = "5, 5"
+            } 
+            else if (edge.type === "dashed") {
+                edgeStroke = "10,10"
+            }
+            else {
+                edgeStroke = ""
+            }
             return root_html.insert("line", ":first-child")
             .attr("x1", edge.x1)
             .attr("y1", edge.y1)
@@ -785,6 +812,7 @@
             .attr("y2", edge.y2)
             .style("stroke", edge.color)
             .attr("stroke-width", edge.stroke_width)
+            .attr("stroke-dasharray", edgeStroke)
         }
 
     }
