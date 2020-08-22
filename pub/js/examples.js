@@ -79,30 +79,38 @@ function nextPicture(num) {
     console.log(picture)
 }
 
-// const removeCirc = cg2.addBlob("removeCirc", "circle", {radius: 60}, 65, 100, "lightblue", "red")
-// removeCirc.addText("No! Don't", "Verdana", "25px", "center", "black")
-// // Connect/Disconnect
-// const connectCirc = cg2.addBlob("connectCirc1", "circle", {radius: 50}, 240, 100, "lightgreen", "purple")
-// const connectRect = cg2.addBlob("connectRect", "rectangle", {height: 70, width: 100}, 345, 70, "yellow", "blue")
-// // Link
-// const linkRect = cg2.addBlob("linkBlob", "rectangle", {height: 80, width: 100}, 510, 10, "pink", "lightblue")
-// linkRect.addText("Follow Me!", "Verdana", "27px", "center", "black")
-// linkRect.setLink("https://touchpianist.com/")
-// const linkRect2 = cg2.addBlob("linkBlob2", "rectangle", {height: 80, width: 100}, 510, 110, "lightblue", "pink")
-// linkRect2.addText("Follow Me!", "Verdana", "27px", "center", "black")
-// linkRect2.setLink("http://corndog.io/")
-// // Color Change
-// const colorEllip = cg2.addBlob("colorEllip", "ellipse", {radiusx: 100, radiusy: 30}, 765, 100, "black", "black")
-// // Alert
-// const alertCircle = cg2.addBlob("alertCirc", "circle", {radius: 55}, 955, 100, "turquoise", "red")
-// alertCircle.addText("Click me!", "Arial", "27px", "center", "middle", "red")
-// alertCircle.addEvent("click", function() {
-//     alert("This is a callback function. You can add events to all the shapes!")
-//     console.log("This is a secret message...")
-// })
-// // Magic!
-// const magicRect = cg2.addBlob("magicRect", "rectangle", {width: 150, height: 90}, 1085, 75, "black", "black")
-// magicRect.addText("", "comic-sans", "25px", "center", "yellow");
-// magicRect.addText("", "comic-sans", "25px", "center", "yellow");
-// magicRect.addText("Abra-cadabra!", "comic-sans", "25px", "center", "yellow");
 
+// Diagram 3 Code
+const after_html3 = document.querySelector(".diagram-3")
+const cg3 = new Connectogram(after_html3, "diagram3")
+let gameCirc = null;
+const timer = document.querySelector("#timer")
+let clicked = false;
+let startTime = null;
+
+function startGame() {
+    clicked = false;
+    cg3.removeBlob("gameCirc")
+    setTimeout(appear,Math.floor(Math.random() * (5500 - 3000)) + 3000);
+}
+
+function appear() {
+    gameCirc = cg3.addBlob("gameCirc", "circle", {radius: 60}, 250, 100, "lightblue", "red")
+    gameCirc.addText("Click Me!", "Verdana", "25px", "center", "black")
+    gameCirc.addEvent("click", click);
+    startTime = performance.now()
+}
+
+function click() {
+    let endTime = performance.now()
+    const timeElapsed = Math.round(endTime - startTime)
+    if (timeElapsed > 600) {
+        timer.innerHTML = timeElapsed + " milliseconds. Try Again!"
+    }
+    else if (timeElapsed >= 300 && timeElapsed <= 600) {
+        timer.innerHTML = timeElapsed + " milliseconds. Good job!"
+    }
+    else {
+        timer.innerHTML = timeElapsed + " milliseconds. Wow!"
+    }
+}
