@@ -8,7 +8,7 @@ function generateRect(cg) {
     const height = getRandomInteger(25, 200)
     const width = getRandomInteger(25, 200)
     const x = getRandomInteger(25, 1300);
-    const y = getRandomInteger(25, 550);
+    const y = getRandomInteger(25, 500);
     const color = '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
     const bordercolor = '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
     cg.addBlob(name, "rectangle", {height: height, width: width}, x, y, color, bordercolor).toggleDraggable()

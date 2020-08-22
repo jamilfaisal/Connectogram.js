@@ -40,7 +40,7 @@ const fightPath2 = cg.connect(choice2, fight, "dashed", "maroon", 3)
 fightPath2.addLabel("Steal", "Verdana", "20px", "black")
 
 const ignorePath1 = cg.connect(choice2, ignoreAnchor, "default", "darkgreen", 3)
-ignorePath1.addLabel("Ignore Him", "Verdana", "20px", "black")
+ignorePath1.addLabel("Ignore", "Verdana", "20px", "black")
 cg.connect(ignoreAnchor, winState, "default", "darkgreen", 3)
 
 const runPath1 = cg.connect(choice1, runAnchor, "default", "#CCCC00", 3)
@@ -62,31 +62,47 @@ fightlostPath.addLabel("Death", "Verdana", "17px", "darkred")
 // Diagram 2 Code
 const after_html2 = document.querySelector(".diagram-2")
 const cg2 = new Connectogram(after_html2, "diagram2")
-// Remove
-const removeCirc = cg2.addBlob("removeCirc", "circle", {radius: 60}, 65, 100, "lightblue", "red")
-removeCirc.addText("No! Don't", "Verdana", "25px", "center", "black")
-// Connect/Disconnect
-const connectCirc = cg2.addBlob("connectCirc1", "circle", {radius: 50}, 240, 100, "lightgreen", "purple")
-const connectRect = cg2.addBlob("connectRect", "rectangle", {height: 70, width: 100}, 345, 70, "yellow", "blue")
-// Link
-const linkRect = cg2.addBlob("linkBlob", "rectangle", {height: 80, width: 100}, 510, 10, "pink", "lightblue")
-linkRect.addText("Follow Me!", "Verdana", "27px", "center", "black")
-linkRect.setLink("https://touchpianist.com/")
-const linkRect2 = cg2.addBlob("linkBlob2", "rectangle", {height: 80, width: 100}, 510, 110, "lightblue", "pink")
-linkRect2.addText("Follow Me!", "Verdana", "27px", "center", "black")
-linkRect2.setLink("http://corndog.io/")
-// Color Change
-const colorEllip = cg2.addBlob("colorEllip", "ellipse", {radiusx: 100, radiusy: 30}, 765, 100, "black", "black")
-// Alert
-const alertCircle = cg2.addBlob("alertCirc", "circle", {radius: 55}, 955, 100, "turquoise", "red")
-alertCircle.addText("Click me!", "Arial", "27px", "center", "middle", "red")
-alertCircle.addEvent("click", function() {
-    alert("This is a callback function. You can add events to all the shapes!")
-    console.log("This is a secret message...")
-})
-// Magic!
-const magicRect = cg2.addBlob("magicRect", "rectangle", {width: 150, height: 90}, 1085, 75, "black", "black")
-magicRect.addText("", "comic-sans", "25px", "center", "yellow");
-magicRect.addText("", "comic-sans", "25px", "center", "yellow");
-magicRect.addText("Abra-cadabra!", "comic-sans", "25px", "center", "yellow");
+
+const circ1 = cg2.addBlob("circ1", "circle", {radius: 6}, 610, 15, "red", "red")
+circ1.addEvent("click", nextPicture.bind(this, 0))
+const circ2 = cg2.addBlob("circ2", "circle", {radius: 6}, 637, 15, "green", "green")
+circ2.addEvent("click", nextPicture.bind(this, 1))
+const circ3 = cg2.addBlob("circ3", "circle", {radius: 6}, 665, 15, "blue", "blue")
+circ3.addEvent("click", nextPicture.bind(this, 2))
+const circ4 = cg2.addBlob("circ4", "circle", {radius: 6}, 693, 15, "purple", "purple")
+circ4.addEvent("click", nextPicture.bind(this, 3))
+
+function nextPicture(num) {
+    const pictures = ['./img/boxy.png', "./img/creeper.png", "./img/dinosaur.png", "./img/potato_head.png"]
+    const picture = document.querySelector("#picture");
+    picture.setAttribute('src', pictures[num])
+    console.log(picture)
+}
+
+// const removeCirc = cg2.addBlob("removeCirc", "circle", {radius: 60}, 65, 100, "lightblue", "red")
+// removeCirc.addText("No! Don't", "Verdana", "25px", "center", "black")
+// // Connect/Disconnect
+// const connectCirc = cg2.addBlob("connectCirc1", "circle", {radius: 50}, 240, 100, "lightgreen", "purple")
+// const connectRect = cg2.addBlob("connectRect", "rectangle", {height: 70, width: 100}, 345, 70, "yellow", "blue")
+// // Link
+// const linkRect = cg2.addBlob("linkBlob", "rectangle", {height: 80, width: 100}, 510, 10, "pink", "lightblue")
+// linkRect.addText("Follow Me!", "Verdana", "27px", "center", "black")
+// linkRect.setLink("https://touchpianist.com/")
+// const linkRect2 = cg2.addBlob("linkBlob2", "rectangle", {height: 80, width: 100}, 510, 110, "lightblue", "pink")
+// linkRect2.addText("Follow Me!", "Verdana", "27px", "center", "black")
+// linkRect2.setLink("http://corndog.io/")
+// // Color Change
+// const colorEllip = cg2.addBlob("colorEllip", "ellipse", {radiusx: 100, radiusy: 30}, 765, 100, "black", "black")
+// // Alert
+// const alertCircle = cg2.addBlob("alertCirc", "circle", {radius: 55}, 955, 100, "turquoise", "red")
+// alertCircle.addText("Click me!", "Arial", "27px", "center", "middle", "red")
+// alertCircle.addEvent("click", function() {
+//     alert("This is a callback function. You can add events to all the shapes!")
+//     console.log("This is a secret message...")
+// })
+// // Magic!
+// const magicRect = cg2.addBlob("magicRect", "rectangle", {width: 150, height: 90}, 1085, 75, "black", "black")
+// magicRect.addText("", "comic-sans", "25px", "center", "yellow");
+// magicRect.addText("", "comic-sans", "25px", "center", "yellow");
+// magicRect.addText("Abra-cadabra!", "comic-sans", "25px", "center", "yellow");
 
