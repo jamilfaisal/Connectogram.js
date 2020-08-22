@@ -21,9 +21,9 @@
         </div>
         <br/>
         <h3>Add a new Blob:</h3>
-        <form action="addBlob()">
+        <form id="addBlob">
             <label for="blobName">Blob Name:</label>
-            <input type="text" id="blobName" name="blobName" value=""><br>
+            <input type="text" id="blobName" name="blobName" value="" placeholder="Must be unique"><br>
             <label for="blobShape">Blob Shape:</label><br/>
             <input type="radio" id="rectangle" name="blobShape" value="rectangle">
             <label for="rectangle">Rectangle</label>
@@ -40,15 +40,45 @@
             <input type="number" id="blobRadiusy" name="blobRadiusy" value="" placeholder="Radius Y">
             <br>
             <label for="blobX">Blob x-coordinate: </label>
-            <input type="text" id="blobX" name="blobX" value=""><br>
+            <input type="text" id="blobX" name="blobX" value="" placeholder="0-1200"><br>
             <label for="blobX">Blob y-coordinate:</label>
-            <input type="text" id="blobX" name="blobX" value=""><br>
+            <input type="text" id="blobY" name="blobY" value="" placeholder="0-1200"><br>
             <label for="blobColor">Blob Fill Color:</label>
-            <input type="text" id="blobColor" name="blobColor" value=""><br>
+            <input type="text" id="blobColor" name="blobColor" value="" placeholder="Color Name, RGB, HEX"><br>
             <label for="blobBorderColor">Blob Border Color: </label>
-            <input type="text" id="blobBorderColor" name="blobBorderColor" value=""><br>
+            <input type="text" id="blobBorderColor" name="blobBorderColor" value="" placeholder="Color Name, RGB, HEX"><br>
+            <input type="checkbox" id="blobDraggable" name="blobDraggable">
+            <label for="blobDraggable"> Draggable</label><br>
             <br>
             <input type="button" value="Add Blob" onclick="addBlob()">
+        </form>
+        <form id="connectBlob">
+            <h3>Connect two Blobs:</h3>
+            <label for="blobName">Blob 1 Name:</label>
+            <input type="text" id="blob1Name" name="blob1Name" value="" placeholder="Must be unique"><br>
+            <label for="blobName">Blob 2 Name:</label>
+            <input type="text" id="blob2Name" name="blob2Name" value="" placeholder="Must be unique"><br>
+            <input type="radio" id="edgeSolid" name="edgeType" value="default">
+            <label for="edgeSolid">Solid</label>
+            <br>
+            <input type="radio" id="edgeDotted" name="edgeType" value="dotted">
+            <label for="edgeDotted">Dotted</label>
+            <br>
+            <input type="radio" id="edgeDashed" name="edgeType" value="dashed">
+            <label for="edgeDashed">Dashed</label>
+            <br>
+            <label for="edgeLabel">Edge Label:</label>
+            <input type="text" id="edgeLabel" name="edgeLabel" value="" placeholder=""><br>
+            <label for="edgeLabel">Edge Label Color:</label>
+            <input type="text" id="edgeLabelColor" name="edgeLabelColor" value="" placeholder="Color Name, RGB, HEX"><br>
+            <label for="edgeLabel">Edge Label Font Size:</label>
+            <input type="number" id="edgeLabelFontSize" name="edgeLabelFontSize" value="" placeholder="(pixels)"><br>
+            <label for="edgeColor">Edge Color:</label>
+            <input type="text" id="edgeColor" name="edgeColor" value="" placeholder="Color Name, RGB, HEX"><br>
+            <label for="edgeWidth">Edge Width: </label>
+            <input type="text" id="edgeWidth" name="edgeWidth" value="" placeholder="0-10"><br>
+            <br>
+            <input type="button" value="Connect Blobs" onclick="connect()">
         </form>
         <br><br>
 	</body>

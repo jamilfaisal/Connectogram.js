@@ -31,3 +31,9 @@ a, a:focus, a:hover {
     height: 500px;
     border: 3px solid black;
 }
+
+#connectBlob {
+    position: absolute;
+    top: 695px;
+    left: 700px;
+}
