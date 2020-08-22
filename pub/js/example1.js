@@ -57,3 +57,6 @@ runPath4.addLabel("Success", "Verdana", "15px", "#7BE493" )
 
 const fightlostPath = cg.connect(fight, loseState, "default", "black", 3)
 fightlostPath.addLabel("Death", "Verdana", "17px", "darkred")
+
+const fightWinPath = cg.connect(fight, winState, "default", "006633", 3)
+fightWinPath.addLabel("+300 xp", "Verdana", "17px", "darkgreen")
