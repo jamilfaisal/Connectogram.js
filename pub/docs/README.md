@@ -28,6 +28,11 @@ Edges create associations between any two Blobs in the Connectogram.
 
 Edges have visual customization options such as color, type (“dotted”, “dashed”), and can be attached with a label.
 
+### Anchors
+Anchors are small points that can be placed on the Connectogram.
+
+Edges can connect to Anchors which allows for more maneuverability between Blob connections.
+
 ### Uses
 Check out the examples page [here!](https://connectogram.herokuapp.com/examples)
 
