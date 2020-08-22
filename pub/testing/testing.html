@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <title>Connectogram.js Sandbox</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+        <link rel="stylesheet" href="../cgram-styles.css">
+        <link rel="stylesheet" href="./styles.css">
+        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
+        <script defer type="text/javascript" src='../js/connectogram.js'></script>
+		<script defer type="text/javascript" src='../js/testing.js'></script>
+	</head>
+	<body>
+        <a href="/">
+            <h1 id="main_title">Connectogram.js</h1>
+        </a>
+        <br/>
+        <h4>You can test out the library on this page!</h4>
+        <h5> Note: Origin (0,0) is the top-left corner</h5>
+        <div class="testdiagram">
+
+        </div>
+        <br/>
+        <h3>Add a new Blob:</h3>
+        <form action="addBlob()">
+            <label for="blobName">Blob Name:</label>
+            <input type="text" id="blobName" name="blobName" value=""><br>
+            <label for="blobShape">Blob Shape:</label><br/>
+            <input type="radio" id="rectangle" name="blobShape" value="rectangle">
+            <label for="rectangle">Rectangle</label>
+            <input type="number" id="blobHeight" name="blobHeight" value="" placeholder="Height">
+            <input type="number" id="blobWidth" name="blobWidth" value="" placeholder="Width">
+            <br>
+            <input type="radio" id="circle" name="blobShape" value="circle">
+            <label for="circle">Circle</label>
+            <input type="number" id="blobRadius" name="blobRadius" value="" placeholder="Radius">
+            <br>
+            <input type="radio" id="ellipse" name="blobShape" value="ellipse">
+            <label for="ellipse">Ellipse</label>
+            <input type="number" id="blobRadiusx" name="blobRadiusx" value="" placeholder="Radius X">
+            <input type="number" id="blobRadiusy" name="blobRadiusy" value="" placeholder="Radius Y">
+            <br>
+            <label for="blobX">Blob x-coordinate: </label>
+            <input type="text" id="blobX" name="blobX" value=""><br>
+            <label for="blobX">Blob y-coordinate:</label>
+            <input type="text" id="blobX" name="blobX" value=""><br>
+            <label for="blobColor">Blob Fill Color:</label>
+            <input type="text" id="blobColor" name="blobColor" value=""><br>
+            <label for="blobBorderColor">Blob Border Color: </label>
+            <input type="text" id="blobBorderColor" name="blobBorderColor" value=""><br>
+            <br>
+            <input type="button" value="Add Blob" onclick="addBlob()">
+        </form>
+        <br><br>
+	</body>
+</html>
